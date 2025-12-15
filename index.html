@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management | Streamline Your Team Work</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --primary-color: #4361ee;
+            --primary-light: #eef2ff;
+            --secondary-color: #3a0ca3;
+            --accent-color: #4cc9f0;
+            --text-dark: #2b2d42;
+            --text-light: #6c757d;
+            --text-white: #f8f9fa;
+            --border-color: #e9ecef;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --border-radius: 12px;
+        }
+
+        body {
+            color: var(--text-dark);
+            /* Subtle blue, modern layered gradient background */
+            background:
+                radial-gradient(1200px circle at 0% -10%, rgba(76, 201, 240, 0.18), rgba(76, 201, 240, 0) 60%),
+                radial-gradient(1000px circle at 100% 110%, rgba(67, 97, 238, 0.12), rgba(67, 97, 238, 0) 55%),
+                linear-gradient(135deg, #eef2ff 0%, #e9efff 50%, #e6e9ff 100%);
+            background-attachment: fixed, fixed, fixed;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header & Logo */
+        header {
+            padding: 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-placeholder {
+            width: 180px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .logo-placeholder:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(67, 97, 238, 0.15);
+        }
+
+        .logo-placeholder i {
+            margin-right: 10px;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            padding: 60px 0 100px;
+            display: flex;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .hero-content {
+            flex: 1;
+            padding-right: 60px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* Typing Animation */
+        .title-container {
+            margin-bottom: 24px;
+            height: 80px;
+            overflow: hidden;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.1;
+            margin-bottom: 10px;
+        }
+
+        .title::after {
+            content: "|";
+            animation: blink 1s infinite;
+            color: var(--primary-color);
+            margin-left: 5px;
+        }
+
+        .typing-text {
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 3px solid var(--primary-color);
+            animation: typing 2.5s steps(20, end) forwards, blink-caret 0.75s step-end infinite;
+            max-width: 0;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--text-light);
+            margin-bottom: 40px;
+            animation: fadeIn 1.2s ease-out 1s both;
+        }
+
+        /* Buttons */
+        .buttons {
+            display: flex;
+            gap: 20px;
+            animation: fadeIn 1.4s ease-out 1.4s both;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.25);
+        }
+
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.35);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover, .btn-secondary:focus {
+            background-color: var(--primary-light);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.15);
+        }
+
+        /* Hero Image Placeholder */
+        .image-placeholder {
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(145deg, #e6e9ff, #ffffff);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .image-placeholder::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        .placeholder-icon {
+            font-size: 6rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            z-index: 1;
+        }
+
+        .placeholder-text {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            z-index: 1;
+            font-weight: 500;
+        }
+
+        /* Screenshots Section */
+        .screenshots-section {
+            padding: 100px 0;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .screenshots-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .screenshot-placeholder {
+            width: 320px;
+            height: 220px;
+            border-radius: 16px;
+            background: linear-gradient(145deg, #f0f2ff, #ffffff);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screenshot-placeholder:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .screenshot-placeholder::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        .screenshot-icon {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            z-index: 1;
+        }
+
+        .screenshot-text {
+            font-size: 1rem;
+            color: var(--text-light);
+            z-index: 1;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes typing {
+            from { max-width: 0; }
+            to { max-width: 100%; }
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero-section {
+                flex-direction: column;
+                padding: 40px 0 80px;
+            }
+            
+            .hero-content {
+                padding-right: 0;
+                margin-bottom: 60px;
+                text-align: center;
+            }
+            
+            .title {
+                font-size: 2.8rem;
+            }
+            
+            .title-container {
+                height: 70px;
+            }
+            
+            .buttons {
+                justify-content: center;
+            }
+            
+            .image-placeholder {
+                height: 400px;
+                max-width: 600px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.2rem;
+            }
+            
+            .title-container {
+                height: 60px;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 220px;
+            }
+            
+            .screenshot-placeholder {
+                width: 280px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .logo-placeholder {
+                width: 150px;
+                height: 45px;
+                font-size: 1.2rem;
+            }
+            
+            .title {
+                font-size: 1.8rem;
+            }
+            
+            .title-container {
+                height: 50px;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .screenshots-container {
+                gap: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header with Logo -->
+        <header>
+            <div class="logo-placeholder">
+                <i class="fas fa-tasks"></i>
+                TaskFlow
+            </div>
+            <nav>
+                <a href="#" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">Features</a>
+            </nav>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <!-- Left Column: Content -->
+            <div class="hero-content">
+                <div class="title-container">
+                    <h1 class="title">
+                        <span class="typing-text">Project Management</span>
+                    </h1>
+                </div>
+                <p class="subtitle">Make your team work easier!</p>
+                <div class="buttons">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-rocket"></i>
+                        Get Started
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Column: Visual -->
+            <div class="hero-visual">
+                <div class="image-placeholder">
+                    <i class="fas fa-chart-line placeholder-icon"></i>
+                    <p class="placeholder-text">Project Management Dashboard</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Screenshots Section -->
+    <section class="screenshots-section">
+        <div class="container">
+            <h2 class="section-title">Explore Our Features</h2>
+            <div class="screenshots-container">
+                <!-- Screenshot 1 -->
+                <div class="screenshot-placeholder">
+                    <i class="fas fa-kanban screenshot-icon"></i>
+                    <p class="screenshot-text">Kanban Board View</p>
+                </div>
+                
+                <!-- Screenshot 2 -->
+                <div class="screenshot-placeholder">
+                    <i class="fas fa-calendar-alt screenshot-icon"></i>
+                    <p class="screenshot-text">Project Timeline</p>
+                </div>
+                
+                <!-- Screenshot 3 -->
+                <div class="screenshot-placeholder">
+                    <i class="fas fa-chart-pie screenshot-icon"></i>
+                    <p class="screenshot-text">Analytics Dashboard</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="container">
+        <p>© 2023 TaskFlow Project Management. All rights reserved.</p>
+        <p style="margin-top: 10px;">Easy to replace with real assets</p>
+    </footer>
+
+    <script>
+        // Enhanced typing animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleElement = document.querySelector('.title');
+            const typingText = document.querySelector('.typing-text');
+            const text = "Project Management";
+            
+            // Reset for animation
+            typingText.style.maxWidth = '0';
+            typingText.textContent = text;
+            
+            // Start typing animation after a brief delay
+            setTimeout(() => {
+                typingText.style.animation = 'typing 2.5s steps(20, end) forwards, blink-caret 0.75s step-end infinite';
+            }, 500);
+            
+            // Add hover effects for buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+                
+                button.addEventListener('focus', function() {
+                    this.style.outline = '2px solid ' + getComputedStyle(document.documentElement).getPropertyValue('--primary-color');
+                    this.style.outlineOffset = '2px';
+                });
+                
+                button.addEventListener('blur', function() {
+                    this.style.outline = 'none';
+                });
+            });
+            
+            // Add click effects for buttons
+            const getStartedBtn = document.querySelector('.btn-primary');
+            const loginBtn = document.querySelector('.btn-secondary');
+            
+            getStartedBtn.addEventListener('click', function() {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-rocket"></i> Get Started';
+                    alert('Welcome! Get Started button clicked. This would navigate to the signup page.');
+                }, 1500);
+            });
+            
+            loginBtn.addEventListener('click', function() {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting...';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+                    alert('Login button clicked. This would navigate to the login page.');
+                }, 1500);
+            });
+            
+            // Add shimmer animation to screenshot placeholders on hover
+            const screenshotPlaceholders = document.querySelectorAll('.screenshot-placeholder');
+            screenshotPlaceholders.forEach(placeholder => {
+                placeholder.addEventListener('mouseenter', function() {
+                    this.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.12)';
+                });
+                
+                placeholder.addEventListener('mouseleave', function() {
+                    this.style.boxShadow = 'var(--shadow)';
+                });
+            });
+        });
+        
+        // Add CSS for blink-caret animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes blink-caret {
+                from, to { border-color: transparent; }
+                50% { border-color: var(--primary-color); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
