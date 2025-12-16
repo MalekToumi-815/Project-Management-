@@ -274,7 +274,7 @@
 
 
 	// GET /users/profile — profil utilisateur (auth)
-	async function getUserProfile() {
+	async function getUserProfileproject() {
 		const url = `http://localhost:9090/users/profile`;
 		try {
 			const res = await fetch(url, {
@@ -297,7 +297,7 @@
 		}
 	}
 
-	async function getUserProfile() {
+	async function getUserProfilehome() {
 		const url = 'http://localhost:9090/users/profile';
 		const token = localStorage.getItem('authToken');
 		
@@ -626,7 +626,8 @@
 	}
 
 	window.loginUser = loginUser;
-	window.getUserProfile = getUserProfile;
+	window.getUserProfileproject = getUserProfileproject;
+	window.getUserProfilehome = getUserProfilehome;
 	window.updateProfile = updateProfile;
 	window.updatePassword = updatePassword;
 	window.getUserCreatedProjects = getUserCreatedProjects;

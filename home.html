@@ -944,12 +944,12 @@
   <script>
     async function loadUserProfile() {
       try {
-        if (typeof window.getUserProfile !== 'function') {
-          console.error('getUserProfile function not available');
+        if (typeof window.getUserProfilehome !== 'function') {
+          console.error('getUserProfilehome function not available');
           return;
         }
 
-        const { ok, user } = await window.getUserProfile();
+        const { ok, user } = await window.getUserProfilehome();
         if (ok && user) {
           const welcomeTitle = document.getElementById('welcomeTitle');
           welcomeTitle.textContent = `Welcome back, ${user.prenom} ${user.nom}! 👋`;
@@ -1409,19 +1409,13 @@
           return;
         }
 
-        const { ok, message, project } = await window.createProject(projectName, projectDescription);
+        const { ok, message } = await window.createProject(projectName, projectDescription);
         
         if (ok) {
           notify('✅ ' + message, 3000);
           closeCreateProjectModal();
-          
-          // Add the new project to the list immediately
-          if (project) {
-            addProjectToList(project);
-          } else {
-            // If no project data returned, reload the entire list
-            loadCreatedProjects();
-          }
+          // Reload created projects to update the list
+          loadCreatedProjects();
         } else {
           notify('❌ ' + message, 3000);
         }
@@ -1429,27 +1423,6 @@
         console.error('Error creating project:', error);
         notify('❌ An error occurred while creating the project', 3000);
       }
-    }
-
-    function addProjectToList(project) {
-      const listElement = document.getElementById('createdProjectsList');
-      if (!listElement) return;
-
-      const projectItem = document.createElement('div');
-      projectItem.className = 'project-item';
-      projectItem.setAttribute('onclick', `redirectToProject('${project.id}')`);
-      projectItem.innerHTML = `
-        <div class="project-info">
-          <div class="project-name">${project.nom || 'Untitled'}</div>
-          <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 8px;">
-            <div>${dateCreation}</div>
-          </div>
-        </div>
-        <div class="project-actions">
-          <button class="btn btn-secondary" onclick="event.stopPropagation(); confirmDeleteProject('${project.id}')">Delete</button>
-        </div>
-      `;
-      listElement.appendChild(projectItem);
     }
 
     async function confirmDeleteProject(projectId) {
@@ -1468,20 +1441,8 @@
         
         if (ok) {
           notify('✅ ' + message, 3000);
-          // Remove the project from the list
-          const createdProjectsList = document.getElementById('createdProjectsList');
-          const projectItems = createdProjectsList.querySelectorAll('.project-item');
-          projectItems.forEach(item => {
-            const button = item.querySelector('button');
-            if (button && button.getAttribute('onclick').includes(projectId)) {
-              item.remove();
-            }
-          });
-          
-          // If list is empty, show "No created projects" message
-          if (createdProjectsList.children.length === 0) {
-            createdProjectsList.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">No created projects</p>';
-          }
+          // Reload created projects to update the list
+          loadCreatedProjects();
         } else {
           notify('❌ ' + message, 3000);
         }
@@ -1507,20 +1468,8 @@
         
         if (ok) {
           notify('✅ ' + message, 3000);
-          // Remove the project from the list
-          const joinedProjectsList = document.getElementById('joinedProjectsList');
-          const projectItems = joinedProjectsList.querySelectorAll('.project-item');
-          projectItems.forEach(item => {
-            const button = item.querySelector('button');
-            if (button && button.getAttribute('onclick').includes(projectId)) {
-              item.remove();
-            }
-          });
-          
-          // If list is empty, show "No joined projects" message
-          if (joinedProjectsList.children.length === 0) {
-            joinedProjectsList.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">No joined projects</p>';
-          }
+          // Reload joined projects to update the list
+          loadJoinedProjects();
         } else {
           notify('❌ ' + message, 3000);
         }
@@ -1620,6 +1569,7 @@
       document.getElementById('createdProjectsList').addEventListener('click', (e) => {
         const target = e.target;
         if (target.closest('[data-action="delete"]')) {
+          e.stopPropagation(); // Prevent bubbling to parent
           const projectId = target.closest('[data-action="delete"]').dataset.projectId;
           confirmDeleteProject(projectId);
         } else if (target.closest('.project-item')) {
@@ -1631,6 +1581,7 @@
       document.getElementById('joinedProjectsList').addEventListener('click', (e) => {
         const target = e.target;
         if (target.closest('[data-action="leave"]')) {
+          e.stopPropagation(); // Prevent bubbling to parent
           const projectId = target.closest('[data-action="leave"]').dataset.projectId;
           confirmLeaveProject(projectId);
         } else if (target.closest('.project-item')) {

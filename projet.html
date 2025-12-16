@@ -413,7 +413,7 @@
       let currentUser = null; // Cache for the current user's profile
 
       try {
-        const { ok: profileOk, data: profileData } = await getUserProfile();
+        const { ok: profileOk, data: profileData } = await getUserProfileproject();
         if (profileOk) {
           currentUser = profileData;
         }
@@ -526,8 +526,19 @@
 
         // --- Sorting Logic ---
         const authorFullName = projectData.createurNom;
-        const author = filteredMembers.find(m => `${m.nom} ${m.prenom}` === authorFullName);
-        const me = currentUser ? filteredMembers.find(m => m.nom === currentUser.nom && m.prenom === currentUser.prenom) : null;
+        // Try both name orders for author matching
+        const author = filteredMembers.find(m => 
+          `${m.prenom} ${m.nom}` === authorFullName || 
+          `${m.nom} ${m.prenom}` === authorFullName ||
+          m.id === projectData.createurId
+        );
+        
+        // Match current user by email for reliability
+        const me = currentUser ? filteredMembers.find(m => 
+          m.email === currentUser.email ||
+          (m.nom === currentUser.nom && m.prenom === currentUser.prenom) ||
+          m.id === currentUser.id
+        ) : null;
 
         // Filter out author and current user to get the rest
         const otherMembers = filteredMembers.filter(m => {
@@ -562,7 +573,7 @@
           li.innerHTML = `
             <div class="member-avatar">${(member.prenom || '?').charAt(0)}${(member.nom || '?').charAt(0)}</div>
             <div class="member-info">
-              <div class="member-name">${member.prenom || ''} ${member.nom || 'Unknown'} ${isCurrentUser ? '(me)' : ''}</div>
+              <div class="member-name">${member.prenom || ''} ${member.nom || 'Unknown'}${isCurrentUser ? ' (me)' : ''}</div>
               <div class="member-role">${isAuthor ? 'Author' : 'Member'}</div>
             </div>
             ${isAuthor ? '<span class="author-tag">Author</span>' : kickButtonHtml}
