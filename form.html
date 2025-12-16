@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlow | Account</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    :root {
+      --primary-color: #4361ee;
+      --primary-light: #eef2ff;
+      --secondary-color: #3a0ca3;
+      --accent-color: #4cc9f0;
+      --text-dark: #2b2d42;
+      --text-light: #6c757d;
+      --text-white: #f8f9fa;
+      --border-color: #e9ecef;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --border-radius: 16px;
+    }
+
+    /* Background gradient to match index.html style */
+    body {
+      color: var(--text-dark);
+      background:
+        radial-gradient(1200px circle at 0% -10%, rgba(76, 201, 240, 0.18), rgba(76, 201, 240, 0) 60%),
+        radial-gradient(1000px circle at 100% 110%, rgba(67, 97, 238, 0.12), rgba(67, 97, 238, 0) 55%),
+        linear-gradient(135deg, #eef2ff 0%, #e9efff 50%, #e6e9ff 100%);
+      background-attachment: fixed, fixed, fixed;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 40px 24px;
+    }
+
+    .container { width: 100%; max-width: 1000px; }
+
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .logo-placeholder {
+      width: 180px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; font-weight: 700; font-size: 1.2rem; box-shadow: var(--shadow);
+    }
+    nav a { color: var(--primary-color); text-decoration: none; font-weight: 500; }
+
+    /* Flip Card Shell */
+    .flip-shell { perspective: 1400px; }
+    .card { position: relative; width: 100%; max-width: 860px; height: 560px; margin: 0 auto; }
+    .card-inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: var(--transition); }
+    .card.is-login .card-inner { transform: rotateY(180deg); }
+
+    .card-face { position: absolute; inset: 0; border-radius: var(--border-radius); box-shadow: var(--shadow); background: #fff; border: 1px solid var(--border-color); backface-visibility: hidden; overflow: hidden; display: grid; grid-template-columns: 1.1fr 1fr; }
+    .card-face.login { transform: rotateY(180deg); }
+
+    /* Decorative side */
+    .side { background: linear-gradient(145deg, #f0f2ff, #ffffff); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; }
+    .side .icon { font-size: 4rem; color: var(--primary-color); margin-bottom: 16px; }
+    .side .copy { color: var(--text-light); text-align: center; max-width: 340px; }
+
+    /* Form side */
+    .pane { padding: 48px; display: flex; flex-direction: column; gap: 20px; }
+    .title { font-size: 2rem; font-weight: 800; color: var(--text-dark); }
+
+    .form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form.single { grid-template-columns: 1fr; }
+
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .label { font-size: 0.95rem; color: var(--text-light); }
+    .input, .select {
+      padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border-color); outline: none; transition: var(--transition); background: #fff; color: var(--text-dark);
+    }
+    .input:focus, .select:focus { border-color: var(--primary-color); box-shadow: 0 6px 20px rgba(67,97,238,0.12); }
+
+    /* Password visibility toggle */
+    .input-wrap { position: relative; }
+    .has-eye .input { padding-right: 44px; }
+    .eye-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); border: none; background: transparent; color: var(--text-light); cursor: pointer; padding: 6px; border-radius: 8px; transition: var(--transition); }
+    .eye-btn:hover { color: var(--primary-color); transform: translateY(-50%) scale(1.05); }
+    .eye-btn i { font-size: 1rem; }
+
+    .actions { display: flex; gap: 12px; align-items: center; }
+    .btn { padding: 14px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 10px; transition: var(--transition); }
+    .btn-primary { background-color: var(--primary-color); color: #fff; box-shadow: 0 6px 20px rgba(67,97,238,0.25); }
+    .btn-primary:hover { transform: translateY(-3px); background-color: var(--secondary-color); box-shadow: 0 10px 25px rgba(67,97,238,0.35); }
+    .btn-secondary { background-color: #fff; color: var(--primary-color); border: 2px solid var(--primary-color); margin-top: 15px;}
+    .btn-secondary:hover { transform: translateY(-3px); background-color: var(--primary-light); box-shadow: 0 6px 20px rgba(67,97,238,0.15); }
+
+    .switch { color: var(--text-light); }
+    .link { color: var(--primary-color); font-weight: 600; cursor: pointer; text-decoration: none; }
+
+    /* Terms row */
+    .terms-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: center; }
+    .checkbox { width: 20px; height: 20px; accent-color: var(--primary-color); }
+    .tos-label { display: flex; align-items: center; gap: 12px; color: var(--text-dark); }
+
+    /* Responsive */
+    @media (max-width: 980px) {
+      .card { height: 660px; }
+      .card-face { grid-template-columns: 1fr; }
+      .side { display: none; }
+      .pane { padding: 36px; }
+    }
+    @media (max-width: 560px) {
+      .form { grid-template-columns: 1fr; }
+      .terms-row { grid-template-columns: 1fr; }
+      .title { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo-placeholder"><i class="fas fa-tasks"></i>&nbsp;TaskFlow</div>
+      <nav><a href="index.html">Home</a></nav>
+    </header>
+
+    <div class="flip-shell">
+      <div class="card" id="card">
+        <div class="card-inner">
+          <!-- Sign Up Face -->
+          <section class="card-face signup">
+            <aside class="side">
+              <i class="fas fa-user-plus icon"></i>
+              <p class="copy">Create tasks, collaborate with your team, and keep momentum. Your workspace awaits.</p>
+              <button class="btn btn-secondary" id="goLogin"><i class="fas fa-sign-in-alt"></i> Login</button>
+            </aside>
+            <div class="pane">
+              <h2 class="title">Create your account</h2>
+              <form class="form" id="signupForm" novalidate>
+                <!-- Row 1: Nom / Prenom -->
+                <div class="field">
+                  <label class="label" for="prenom">Prenom</label>
+                  <input class="input" type="text" id="prenom" name="prenom" placeholder="Your first name" required />
+                </div>
+                <div class="field">
+                  <label class="label" for="nom">Nom</label>
+                  <input class="input" type="text" id="nom" name="nom" placeholder="Your last name" required />
+                </div>
+
+                <!-- Row 2: Email (full width) -->
+                <div class="field" style="grid-column: 1 / -1;">
+                  <label class="label" for="email">Email</label>
+                  <input class="input" type="email" id="email" name="email" placeholder="you@example.com" required />
+                </div>
+
+                <!-- Row 3: Password / Confirm -->
+                <div class="field">
+                  <label class="label" for="mdp">Mot de passe</label>
+                  <div class="input-wrap has-eye">
+                    <input class="input" type="password" id="mdp" name="mdp" placeholder="••••••••" required />
+                    <button type="button" class="eye-btn" data-target="mdp" aria-label="Show password"><i class="fas fa-eye"></i></button>
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="label" for="confirmPwd">Confirmer le mot de passe</label>
+                  <div class="input-wrap has-eye">
+                    <input class="input" type="password" id="confirmPwd" name="confirmPwd" placeholder="••••••••" required />
+                    <button type="button" class="eye-btn" data-target="confirmPwd" aria-label="Show password"><i class="fas fa-eye"></i></button>
+                  </div>
+                </div>
+
+                <!-- Row 4: Terms + Action -->
+                <div class="terms-row" style="grid-column: 1 / -1;">
+                  <div class="field">
+                    <span class="label">Terms of Service</span>
+                    <label class="tos-label" for="tos">
+                      <input type="checkbox" id="tos" name="tos" class="checkbox" required />
+                      <span>I agree to the <a class="link" href="#">Terms of Service</a></span>
+                    </label>
+                  </div>
+                  <div class="actions">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-user-check"></i> Sign Up</button>
+                  </div>
+                </div>
+                <p class="switch">Already have an account? <a class="link" id="linkLogin">Login</a></p>
+              </form>
+            </div>
+          </section>
+
+          <!-- Login Face -->
+          <section class="card-face login">
+            <aside class="side">
+              <i class="fas fa-door-open icon"></i>
+              <p class="copy">Jump back into your projects and keep things moving.</p>
+              <button class="btn btn-secondary" id="goSignup"><i class="fas fa-user-plus"></i> Sign Up</button>
+            </aside>
+            <div class="pane">
+              <h2 class="title">Welcome back</h2>
+              <form class="form single" id="loginForm" novalidate>
+                <div class="field">
+                  <label class="label" for="loginEmail">Email</label>
+                  <input class="input" type="email" id="loginEmail" name="loginEmail" placeholder="you@example.com" required />
+                </div>
+                <div class="field">
+                  <label class="label" for="pwd">Password</label>
+                  <div class="input-wrap has-eye">
+                    <input class="input" type="password" id="pwd" name="pwd" placeholder="••••••••" required />
+                    <button type="button" class="eye-btn" data-target="pwd" aria-label="Show password"><i class="fas fa-eye"></i></button>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Log In</button>
+                </div>
+                <p class="switch">New here? <a class="link" id="linkSignup">Create account</a></p>
+              </form>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="toast.js"></script>
+  <script src="fetch.js"></script>
+  <script>
+    // Flip interactions
+    const card = document.getElementById('card');
+    const goLogin = document.getElementById('goLogin');
+    const linkLogin = document.getElementById('linkLogin');
+    const goSignup = document.getElementById('goSignup');
+    const linkSignup = document.getElementById('linkSignup');
+
+    const setMode = (mode) => {
+      if (mode === 'login') card.classList.add('is-login');
+      else card.classList.remove('is-login');
+    };
+
+    goLogin.addEventListener('click', () => setMode('login'));
+    linkLogin.addEventListener('click', (e) => { e.preventDefault(); setMode('login'); });
+    goSignup.addEventListener('click', () => setMode('signup'));
+    linkSignup.addEventListener('click', (e) => { e.preventDefault(); setMode('signup'); });
+
+    // Simple form feedback
+    const signupForm = document.getElementById('signupForm');
+    const loginForm = document.getElementById('loginForm');
+
+    // Password visibility toggles
+    document.querySelectorAll('.eye-btn').forEach(btn => {
+      const targetId = btn.getAttribute('data-target');
+      const input = document.getElementById(targetId);
+      btn.addEventListener('click', () => {
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        const icon = btn.querySelector('i');
+        if (icon) {
+          icon.classList.toggle('fa-eye', !show);
+          icon.classList.toggle('fa-eye-slash', show);
+        }
+      });
+    });
+
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!signupForm.reportValidity()) {
+        notify('Please fill all required fields.');
+        return;
+      }
+      const prenom = document.getElementById('prenom').value.trim();
+      const nom = document.getElementById('nom').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const mdp = document.getElementById('mdp').value;
+      const confirmPwd = document.getElementById('confirmPwd').value;
+      const tosChecked = document.getElementById('tos').checked;
+
+      if (mdp !== confirmPwd) {
+        notify('Passwords do not match.');
+        return;
+      }
+      if (!tosChecked) {
+        notify('Please agree to the Terms of Service.');
+        return;
+      }
+
+      const btn = signupForm.querySelector('button[type="submit"]');
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+      try {
+        const { ok, message } = await createUser(nom, prenom, email, mdp);
+        notify(message);
+        if (ok) setMode('login');
+      } catch (_) {
+        notify('Unable to sign up. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!loginForm.reportValidity()) {
+        notify('Please fill all required fields.');
+        return;
+      }
+      const email = document.getElementById('loginEmail').value.trim();
+      const pwd = document.getElementById('pwd').value;
+
+      const btn = loginForm.querySelector('button[type="submit"]');
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+      try {
+        const { ok, token, message } = await loginUser(email, pwd);
+        if (ok) {
+          console.log('JWT token:', token);
+          localStorage.setItem('authToken', token);
+          notify('Loged in!');
+        } else {
+          notify(message || 'Login failed');
+        }
+      } catch (_) {
+        notify('Unable to login in. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
+    });
+  </script>
+</body>
+</html>
