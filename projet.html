@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workify | Projet</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" type="image/png" href="images/logo.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3a0ca3;
+      --accent-color: #4cc9f0;
+      --text-dark: #2b2d42;
+      --text-light: #6c757d;
+      --border-color: #e9ecef;
+      --radius: 16px;
+      --shadow: 0 10px 30px rgba(0,0,0,0.08);
+      --transition: all 0.3s ease;
+    }
+
+    body {
+      color: var(--text-dark);
+      background:
+        radial-gradient(1200px circle at 0% -10%, rgba(76, 201, 240, 0.18), rgba(76, 201, 240, 0) 60%),
+        radial-gradient(1000px circle at 100% 110%, rgba(67, 97, 238, 0.12), rgba(67, 97, 238, 0) 55%),
+        linear-gradient(135deg, #eef2ff 0%, #e9efff 50%, #e6e9ff 100%);
+      background-attachment: fixed, fixed, fixed;
+      min-height: 100vh;
+      padding: 0 28px 28px;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    /* Layout: header on top + board */
+    .layout { display: grid; grid-template-columns: 1fr; gap: 22px; align-items: start; }
+
+    /* Sidebar */
+    /* Header bar */
+    .header-bar {
+      background: #fff;
+      /* Full-bleed header (ignore page gutters) */
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+      margin-right: calc(50% - 50vw);
+      border: none;
+      border-bottom: 1px solid var(--border-color);
+      border-radius: 0;
+      box-shadow: none;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 0; }
+    .header-logo { width: 160px; max-width: 25vw; height: auto; display: block; filter: drop-shadow(0 14px 28px rgba(67,97,238,0.35)); }
+    .header-info { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; min-width: 0; }
+    .header-title { font-size: 1.8rem; font-weight: 800; color: var(--text-dark); white-space: nowrap; }
+    .header-desc { color: var(--text-light); max-width: 40ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .header-meta { display: flex; align-items: center; gap: 12px; color: var(--text-light); font-size: 0.95rem; }
+    .header-meta .meta-row { display: inline-flex; align-items: center; gap: 6px; }
+    .header-meta i { color: var(--primary-color); }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .btn { padding: 10px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition); }
+    .btn-primary { background-color: var(--primary-color); color: #fff; box-shadow: 0 6px 20px rgba(67,97,238,0.25); }
+    .btn-primary:hover { transform: translateY(-2px); background-color: var(--secondary-color); }
+    .icon-btn { width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid var(--border-color); background: #fff; color: var(--primary-color); box-shadow: var(--shadow); transition: var(--transition); }
+    .icon-btn:hover { background: var(--accent-color); color: #fff; transform: translateY(-2px); }
+
+    /* Board columns */
+    .board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .list {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .list-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .list-header i { opacity: 0.9; }
+
+    .list-content { padding: 12px; min-height: 160px; color: var(--text-light); font-size: 0.95rem; }
+
+    /* Header colors */
+    .todo { background: linear-gradient(135deg, #4361ee, #3a0ca3); }
+    .progress { background: linear-gradient(135deg, #f4a261, #e76f51); }
+    .verify { background: linear-gradient(135deg, #6a4c93, #b565f1); }
+    .done { background: linear-gradient(135deg, #2ab673, #0f9d58); }
+
+    /* Responsive */
+    @media (max-width: 1000px) {
+      .layout { grid-template-columns: 1fr; }
+      .board { grid-template-columns: repeat(2, 1fr); }
+      .header-logo { width: 140px; }
+    }
+    @media (max-width: 560px) {
+      .board { grid-template-columns: 1fr; }
+      .header-info { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .header-desc { max-width: 100%; }
+    }
+
+    /* Member sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      right: -400px; /* Hidden by default */
+      width: 360px;
+      height: 100%;
+      background: #fff;
+      box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+      transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      z-index: 1100;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar.open { right: 0; }
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .sidebar-title { font-size: 1.2rem; font-weight: 700; }
+    .sidebar-close { font-size: 1.5rem; cursor: pointer; color: var(--text-light); }
+    .sidebar-search {
+      padding: 0 12px 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .sidebar-search input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+    .sidebar-content { flex: 1; overflow-y: auto; padding: 12px; }
+    .member-list { list-style: none; }
+    .member-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: background 0.2s ease;
+    }
+    .member-item:hover { background: #f7f9fc; }
+    .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; margin-right: 12px; }
+    .member-info { flex: 1; }
+    .member-name { font-weight: 600; }
+    .member-role { font-size: 0.85rem; color: var(--text-light); }
+    .author-tag { background: var(--accent-color); color: #fff; font-size: 0.75rem; padding: 2px 6px; border-radius: 6px; margin-left: 8px; }
+    .kick-btn { padding: 6px 12px; font-size: 0.85rem; background: #ffebee; color: #c62828; border: none; border-radius: 8px; cursor: pointer; }
+    .kick-btn:hover { background: #ffcdd2; }
+
+    /* Chat Sidebar */
+    .chat-sidebar {
+      position: fixed;
+      top: 0;
+      right: -400px; /* Hidden by default */
+      width: 360px;
+      height: 100%;
+      background: #fff;
+      box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+      transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      z-index: 1100;
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-sidebar.open { right: 0; }
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .chat-title { font-size: 1.2rem; font-weight: 700; }
+    .chat-close { font-size: 1.5rem; cursor: pointer; color: var(--text-light); }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; }
+    .message-list { list-style: none; padding: 0; margin-top: auto; }
+    .message-item {
+      display: flex;
+      margin-bottom: 12px;
+    }
+    .message-avatar { width: 35px; height: 35px; border-radius: 50%; background: var(--secondary-color); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; margin-right: 10px; flex-shrink: 0; }
+    .message-content { display: flex; flex-direction: column; }
+    .message-author { font-weight: 600; font-size: 0.9rem; }
+    .message-text { background: #f1f3f5; padding: 8px 12px; border-radius: 12px; font-size: 0.95rem; }
+    .message-date { font-size: 0.75rem; color: var(--text-light); margin-top: 4px; }
+    .chat-input-form { display: flex; padding: 10px; border-top: 1px solid var(--border-color); gap: 8px; }
+    .chat-input { flex: 1; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; font-size: 1rem; }
+    .send-btn { width: 40px; height: 40px; flex-shrink: 0; }
+
+    /* Edit Dialog */
+    .dialog-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1200;
+      display: none; /* Hidden by default */
+      align-items: center;
+      justify-content: center;
+    }
+    .dialog-backdrop.open { display: flex; }
+    .dialog {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 24px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+    .dialog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .dialog-title { font-size: 1.5rem; font-weight: 700; }
+    .dialog-close { font-size: 1.8rem; cursor: pointer; color: var(--text-light); }
+    .dialog-form .form-group { margin-bottom: 16px; }
+    .dialog-form label { display: block; font-weight: 600; margin-bottom: 8px; }
+    .dialog-form .form-control {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="layout">
+      <!-- Header bar with project details on the left, controls on the right -->
+      <header class="header-bar" id="projectHeader">
+        <div class="header-left">
+          <img src="images/logo.png" alt="Workify" class="header-logo" />
+          <div class="header-info">
+            <div class="header-title" id="pTitle">Projet</div>
+            <div class="header-desc" id="pDesc">Description du projet...</div>
+            <div class="header-meta">
+              <div class="meta-row"><i class="fas fa-user"></i><span id="pAuthor">Auteur: —</span></div>
+              <div class="meta-row"><i class="fas fa-calendar-alt"></i><span id="pDate">Créé le: —</span></div>
+              <div class="meta-row"><i class="fas fa-hashtag"></i><span id="pCode">Join Code: —</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="header-right" id="headerControls">
+          <button class="btn btn-primary" id="btnCreateTask"><i class="fas fa-plus"></i> Create Task</button>
+          <button class="icon-btn" id="btnEdit" aria-label="Edit Project"><i class="fas fa-pencil-alt"></i></button>
+          <button class="icon-btn" id="btnMembers" aria-label="Members"><i class="fas fa-users"></i></button>
+          <button class="icon-btn" id="btnChat" aria-label="Chat"><i class="fas fa-comments"></i></button>
+        </div>
+      </header>
+
+      <!-- Board: 4 lists -->
+      <section class="board">
+        <div class="list">
+          <div class="list-header todo"><i class="fas fa-list"></i> Todo</div>
+          <div class="list-content">No tasks yet.</div>
+        </div>
+        <div class="list">
+          <div class="list-header progress"><i class="fas fa-spinner"></i> en progres</div>
+          <div class="list-content">Add tasks to start progress.</div>
+        </div>
+        <div class="list">
+          <div class="list-header verify"><i class="fas fa-search"></i> en verification</div>
+          <div class="list-content">Awaiting review.</div>
+        </div>
+        <div class="list">
+          <div class="list-header done"><i class="fas fa-check"></i> terminee</div>
+          <div class="list-content">Completed tasks appear here.</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Member Sidebar -->
+  <aside class="sidebar" id="memberSidebar">
+    <div class="sidebar-header">
+      <h3 class="sidebar-title">Project Members</h3>
+      <i class="fas fa-times sidebar-close" id="closeSidebar"></i>
+    </div>
+    <div class="sidebar-search">
+      <input type="text" id="memberSearch" placeholder="Search members...">
+    </div>
+    <div class="sidebar-content">
+      <ul class="member-list" id="memberList">
+        <!-- Member items will be injected here -->
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Chat Sidebar -->
+  <aside class="chat-sidebar" id="chatSidebar">
+    <div class="chat-header">
+      <h3 class="chat-title">Project Chat</h3>
+      <i class="fas fa-times chat-close" id="closeChat"></i>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <ul class="message-list" id="messageList">
+        <!-- Messages will be injected here -->
+      </ul>
+    </div>
+    <form class="chat-input-form" id="chatForm">
+      <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." autocomplete="off" />
+      <button type="submit" class="btn btn-primary icon-btn send-btn" id="sendMsgBtn"><i class="fas fa-paper-plane"></i></button>
+    </form>
+  </aside>
+
+  <!-- Edit Project Dialog -->
+  <div class="dialog-backdrop" id="editDialog">
+    <div class="dialog">
+      <div class="dialog-header">
+        <h3 class="dialog-title">Edit Project</h3>
+        <i class="fas fa-times dialog-close" id="closeEditDialog"></i>
+      </div>
+      <form id="editProjectForm" class="dialog-form">
+        <div class="form-group">
+          <label for="editProjectName">Project Name</label>
+          <input type="text" id="editProjectName" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label for="editProjectDesc">Description</label>
+          <textarea id="editProjectDesc" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="dialog-actions">
+          <button type="button" class="btn" id="cancelEdit">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="toast.js"></script>
+  <script src="fetch.js"></script>
+  <script>
+    // Read projectid from query and fetch project info
+    document.addEventListener('DOMContentLoaded', async () => {
+      const params = new URLSearchParams(window.location.search);
+      const projectId = params.get('projectid');
+      if (!projectId) {
+        notify('No project id provided');
+        return;
+      }
+
+      let projectData = null;
+      let projectMembers = []; // Cache for members
+      let chatMessages = []; // Cache for chat messages
+      let chatInterval = null; // To hold the interval ID
+
+      try {
+        const { ok, data, message } = await getProject(projectId);
+        if (!ok || !data) {
+          notify(message || 'Unable to load project');
+          return;
+        }
+        projectData = data; // Store project data
+        // Fill sidebar
+        document.getElementById('pTitle').textContent = data.nom || 'Projet';
+        document.getElementById('pDesc').textContent = data.description || '—';
+        document.getElementById('pAuthor').textContent = `Auteur: ${data.createurNom || '—'}`;
+        document.getElementById('pCode').textContent = `Join Code: ${projectId}`;
+        // Format date d/m/y
+        const iso = data.dateCreation;
+        if (iso) {
+          const d = new Date(iso);
+          const day = String(d.getDate()).padStart(2, '0');
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const year = d.getFullYear();
+          document.getElementById('pDate').textContent = `Créé le: ${day}/${month}/${year}`;
+        }
+      } catch (e) {
+        notify('Error loading project');
+      }
+
+      // Sidebar elements and logic
+      const memberSidebar = document.getElementById('memberSidebar');
+      const memberList = document.getElementById('memberList');
+      const closeSidebar = document.getElementById('closeSidebar');
+      const memberSearch = document.getElementById('memberSearch');
+
+      const renderMembers = (filter = '') => {
+        if (!projectData) return;
+        memberList.innerHTML = ''; // Clear previous list
+
+        const lowerCaseFilter = filter.toLowerCase();
+        const filteredMembers = projectMembers.filter(member =>
+          (member.nom && member.nom.toLowerCase().includes(lowerCaseFilter)) ||
+          (member.prenom && member.prenom.toLowerCase().includes(lowerCaseFilter))
+        );
+
+        // Find author and move to top
+        const authorFullName = projectData.createurNom;
+        const author = filteredMembers.find(m => `${m.nom} ${m.prenom}` === authorFullName);
+        const otherMembers = filteredMembers.filter(m => !author || `${m.nom} ${m.prenom}` !== authorFullName);
+        const sortedMembers = author ? [author, ...otherMembers] : otherMembers;
+
+        sortedMembers.forEach(member => {
+          const isAuthor = author && member.id === author.id;
+          const li = document.createElement('li');
+          li.className = 'member-item';
+          li.innerHTML = `
+            <div class="member-avatar">${(member.prenom || '?').charAt(0)}${(member.nom || '?').charAt(0)}</div>
+            <div class="member-info">
+              <div class="member-name">${member.prenom || ''} ${member.nom || 'Unknown'}</div>
+              <div class="member-role">${isAuthor ? 'Author' : 'Member'}</div>
+            </div>
+            ${isAuthor ? '<span class="author-tag">Author</span>' : `<button class="kick-btn" data-member-id="${member.id}">Kick</button>`}
+          `;
+          memberList.appendChild(li);
+        });
+      };
+
+      closeSidebar.addEventListener('click', () => memberSidebar.classList.remove('open'));
+      memberSearch.addEventListener('input', (e) => renderMembers(e.target.value));
+
+      // Chat sidebar elements and logic
+      const chatSidebar = document.getElementById('chatSidebar');
+      const messageList = document.getElementById('messageList');
+      const chatMessagesContainer = document.getElementById('chatMessages');
+      const closeChat = document.getElementById('closeChat');
+      const chatForm = document.getElementById('chatForm');
+      const chatInput = document.getElementById('chatInput');
+
+      const renderMessages = () => {
+        messageList.innerHTML = '';
+        chatMessages.forEach(msg => {
+          const li = document.createElement('li');
+          li.className = 'message-item';
+          const d = new Date(msg.dateEnvoi);
+          const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+          li.innerHTML = `
+            <div class="message-avatar">${(msg.author || '?').split(' ').map(n => n[0]).join('')}</div>
+            <div class="message-content">
+              <span class="message-author">${msg.author}</span>
+              <p class="message-text">${msg.contenu}</p>
+              <span class="message-date">${time}</span>
+            </div>
+          `;
+          messageList.appendChild(li);
+        });
+        // Scroll to bottom
+        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+      };
+
+      const fetchMessages = async () => {
+        if (!projectData || !projectData.chatId) return;
+        const { ok, data } = await getChatMessages(projectData.chatId);
+        if (ok) {
+          chatMessages = data || [];
+          renderMessages();
+        }
+      };
+
+      closeChat.addEventListener('click', () => {
+        chatSidebar.classList.remove('open');
+        if (chatInterval) clearInterval(chatInterval); // Stop polling
+      });
+
+      chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const content = chatInput.value.trim();
+        if (!content || !projectData || !projectData.chatId) return;
+
+        chatInput.disabled = true;
+        const { ok, data } = await sendMessage(projectData.chatId, content);
+        chatInput.disabled = false;
+
+        if (ok) {
+          chatInput.value = '';
+          await fetchMessages(); // Refresh messages immediately
+        } else {
+          notify('Failed to send message');
+        }
+      });
+
+      // Edit Dialog logic
+      const editDialog = document.getElementById('editDialog');
+      const editProjectForm = document.getElementById('editProjectForm');
+      const editProjectName = document.getElementById('editProjectName');
+      const editProjectDesc = document.getElementById('editProjectDesc');
+      const closeEditDialog = document.getElementById('closeEditDialog');
+      const cancelEdit = document.getElementById('cancelEdit');
+      const btnEdit = document.getElementById('btnEdit');
+
+      btnEdit.addEventListener('click', () => {
+        if (!projectData) return;
+        // Populate form with current data
+        editProjectName.value = projectData.nom;
+        editProjectDesc.value = projectData.description;
+        editDialog.classList.add('open');
+      });
+
+      const closeDialog = () => editDialog.classList.remove('open');
+      closeEditDialog.addEventListener('click', closeDialog);
+      cancelEdit.addEventListener('click', closeDialog);
+
+      editProjectForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const newName = editProjectName.value.trim();
+        const newDesc = editProjectDesc.value.trim();
+
+        if (!newName) return notify('Project name cannot be empty');
+
+        const { ok, data, message } = await updateProject(projectId, { nom: newName, description: newDesc });
+
+        if (ok) {
+          // Update local data and UI
+          projectData.nom = data.nom;
+          projectData.description = data.description;
+          document.getElementById('pTitle').textContent = data.nom;
+          document.getElementById('pDesc').textContent = data.description;
+          notify('Project updated successfully');
+          closeDialog();
+        } else {
+          notify(message || 'Failed to update project');
+        }
+      });
+
+      // Header controls interactions
+      const btnCreate = document.getElementById('btnCreateTask');
+      const btnMembers = document.getElementById('btnMembers');
+      const btnChat = document.getElementById('btnChat');
+      btnCreate.addEventListener('click', () => {
+        notify('Create Task clicked');
+      });
+
+      btnMembers.addEventListener('click', async () => {
+        if (!projectId) return;
+
+        if (projectMembers.length === 0) {
+          // Fetch only if cache is empty
+          const { ok, data, message } = await getProjectMembers(projectId);
+          if (!ok) return notify(message || 'Unable to load members');
+          projectMembers = data || []; // Cache the members
+        }
+        
+        renderMembers(); // Initial render with no filter
+        memberSidebar.classList.add('open');
+      });
+
+      btnChat.addEventListener('click', async () => {
+        if (!projectData || !projectData.chatId) {
+          return notify('Chat not available for this project.');
+        }
+        
+        await fetchMessages(); // Initial fetch
+        chatSidebar.classList.add('open');
+        
+        // Start polling every 5 seconds
+        if (chatInterval) clearInterval(chatInterval);
+        chatInterval = setInterval(fetchMessages, 5000);
+      });
+
+      // Event delegation for kick buttons
+      memberList.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('kick-btn')) {
+          const memberId = e.target.dataset.memberId;
+          if (!memberId) return;
+
+          // Confirmation before kicking
+          if (!confirm('Are you sure you want to kick this member?')) return;
+
+          const { ok, message } = await kickMember(projectId, memberId);
+          notify(message || 'Action completed');
+
+          if (ok) {
+            // Remove member from cache and re-render
+            projectMembers = projectMembers.filter(m => String(m.id) !== memberId);
+            renderMembers();
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
