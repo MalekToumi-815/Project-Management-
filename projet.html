@@ -410,6 +410,16 @@
       let chatMessages = []; // Cache for chat messages
       let chatInterval = null; // To hold the interval ID
       let projectTasks = []; // Cache for tasks
+      let currentUser = null; // Cache for the current user's profile
+
+      try {
+        const { ok: profileOk, data: profileData } = await getUserProfile();
+        if (profileOk) {
+          currentUser = profileData;
+        }
+      } catch (e) {
+        console.error('Could not fetch user profile', e);
+      }
 
       try {
         const { ok, data, message } = await getProject(projectId);
@@ -514,23 +524,48 @@
           (member.prenom && member.prenom.toLowerCase().includes(lowerCaseFilter))
         );
 
-        // Find author and move to top
+        // --- Sorting Logic ---
         const authorFullName = projectData.createurNom;
         const author = filteredMembers.find(m => `${m.nom} ${m.prenom}` === authorFullName);
-        const otherMembers = filteredMembers.filter(m => !author || `${m.nom} ${m.prenom}` !== authorFullName);
-        const sortedMembers = author ? [author, ...otherMembers] : otherMembers;
+        const me = currentUser ? filteredMembers.find(m => m.nom === currentUser.nom && m.prenom === currentUser.prenom) : null;
+
+        // Filter out author and current user to get the rest
+        const otherMembers = filteredMembers.filter(m => {
+            const isAuthor = author && m.id === author.id;
+            const isMe = me && m.id === me.id;
+            return !isAuthor && !isMe;
+        });
+
+        // Build the sorted list, ensuring author is first, then current user
+        const sortedMembers = [];
+        if (author) {
+            sortedMembers.push(author);
+        }
+        if (me && (!author || me.id !== author.id)) {
+            sortedMembers.push(me);
+        }
+        sortedMembers.push(...otherMembers);
+
+        const canCurrentUserKick = me && author && me.id === author.id;
 
         sortedMembers.forEach(member => {
           const isAuthor = author && member.id === author.id;
+          const isCurrentUser = me && member.id === me.id;
           const li = document.createElement('li');
           li.className = 'member-item';
+
+          let kickButtonHtml = '';
+          if (canCurrentUserKick && !isAuthor && !isCurrentUser) {
+            kickButtonHtml = `<button class="kick-btn" data-member-id="${member.id}">Kick</button>`;
+          }
+
           li.innerHTML = `
             <div class="member-avatar">${(member.prenom || '?').charAt(0)}${(member.nom || '?').charAt(0)}</div>
             <div class="member-info">
-              <div class="member-name">${member.prenom || ''} ${member.nom || 'Unknown'}</div>
+              <div class="member-name">${member.prenom || ''} ${member.nom || 'Unknown'} ${isCurrentUser ? '(me)' : ''}</div>
               <div class="member-role">${isAuthor ? 'Author' : 'Member'}</div>
             </div>
-            ${isAuthor ? '<span class="author-tag">Author</span>' : `<button class="kick-btn" data-member-id="${member.id}">Kick</button>`}
+            ${isAuthor ? '<span class="author-tag">Author</span>' : kickButtonHtml}
           `;
           memberList.appendChild(li);
         });

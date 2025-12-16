@@ -271,6 +271,30 @@
 		}
 	}
 
+	// GET /users/profile — profil utilisateur (auth)
+	async function getUserProfile() {
+		const url = `http://localhost:9090/users/profile`;
+		try {
+			const res = await fetch(url, {
+				method: 'GET',
+				headers: withAuth({ 'Accept': 'application/json' })
+			});
+
+			const text = await res.text();
+			if (res.ok) {
+				let data = null;
+				try { data = text ? JSON.parse(text) : null; } catch (_) { data = null; }
+				return { ok: true, data };
+			}
+
+			let message = 'Request failed';
+			try { const err = text ? JSON.parse(text) : null; if (err && err.message) message = err.message; } catch (_) { if (text) message = text; }
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
 	window.createUser = createUser;
 	window.loginUser = loginUser;
 	window.getProject = getProject;
@@ -281,4 +305,5 @@
 	window.sendMessage = sendMessage;
 	window.updateProject = updateProject;
 	window.updateTaskState = updateTaskState;
+	window.getUserProfile = getUserProfile;
 })();
