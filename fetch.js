@@ -271,6 +271,8 @@
 		}
 	}
 
+
+
 	// GET /users/profile — profil utilisateur (auth)
 	async function getUserProfile() {
 		const url = `http://localhost:9090/users/profile`;
@@ -642,5 +644,6 @@
 	window.sendMessage = sendMessage;
 	window.updateProject = updateProject;
 	window.updateTaskState = updateTaskState;
+	window.createTask = createTask;
 	window.getUserProfile = getUserProfile;
 })();

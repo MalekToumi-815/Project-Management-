@@ -1214,6 +1214,7 @@
           projects.forEach(project => {
             const projectItem = document.createElement('div');
             projectItem.className = 'project-item';
+            projectItem.dataset.projectId = project.id; // Set project ID as a data attribute
             
             // Format date
             const dateCreation = new Date(project.dateCreation).toLocaleDateString('en-US', {
@@ -1229,7 +1230,7 @@
                   <div>${dateCreation}</div>
                 </div>
               </div>
-              <button class="btn btn-primary" style="margin-left: 16px; background: #ef4444;" onclick="confirmDeleteProject(${project.id})"><i class="fas fa-trash"></i> Delete</button>
+              <button class="btn btn-primary" style="margin-left: 16px; background: #ef4444;" data-action="delete" data-project-id="${project.id}"><i class="fas fa-trash"></i> Delete</button>
             `;
             createdProjectsList.appendChild(projectItem);
           });
@@ -1256,6 +1257,7 @@
           projects.forEach(project => {
             const projectItem = document.createElement('div');
             projectItem.className = 'project-item';
+            projectItem.dataset.projectId = project.id; // Set project ID as a data attribute
             
             // Format date
             const dateCreation = new Date(project.dateCreation).toLocaleDateString('en-US', {
@@ -1272,7 +1274,7 @@
                   <div>${dateCreation}</div>
                 </div>
               </div>
-              <button class="btn btn-primary" style="margin-left: 16px; background: #f97316;" onclick="confirmLeaveProject(${project.id})"><i class="fas fa-sign-out-alt"></i> Leave</button>
+              <button class="btn btn-primary" style="margin-left: 16px; background: #f97316;" data-action="leave" data-project-id="${project.id}"><i class="fas fa-sign-out-alt"></i> Leave</button>
             `;
             joinedProjectsList.appendChild(projectItem);
           });
@@ -1430,23 +1432,12 @@
     }
 
     function addProjectToList(project) {
-      const createdProjectsList = document.getElementById('createdProjectsList');
-      
-      // Clear "No projects" message if it exists
-      if (createdProjectsList.innerHTML.includes('No created projects')) {
-        createdProjectsList.innerHTML = '';
-      }
-      
+      const listElement = document.getElementById('createdProjectsList');
+      if (!listElement) return;
+
       const projectItem = document.createElement('div');
       projectItem.className = 'project-item';
-      
-      // Format date
-      const dateCreation = new Date(project.dateCreation).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      });
-      
+      projectItem.setAttribute('onclick', `redirectToProject('${project.id}')`);
       projectItem.innerHTML = `
         <div class="project-info">
           <div class="project-name">${project.nom || 'Untitled'}</div>
@@ -1454,11 +1445,11 @@
             <div>${dateCreation}</div>
           </div>
         </div>
-        <button class="btn btn-primary" style="margin-left: 16px; background: #ef4444;" onclick="confirmDeleteProject(${project.id})"><i class="fas fa-trash"></i> Delete</button>
+        <div class="project-actions">
+          <button class="btn btn-secondary" onclick="event.stopPropagation(); confirmDeleteProject('${project.id}')">Delete</button>
+        </div>
       `;
-      
-      // Add as first item in the list
-      createdProjectsList.insertBefore(projectItem, createdProjectsList.firstChild);
+      listElement.appendChild(projectItem);
     }
 
     async function confirmDeleteProject(projectId) {
@@ -1537,6 +1528,10 @@
         console.error('Error leaving project:', error);
         notify('❌ An error occurred while leaving the project', 3000);
       }
+    }
+
+    function redirectToProject(projectId) {
+      window.location.href = `projet.html?projectid=${encodeURIComponent(projectId)}`;
     }
 
     async function confirmJoinProject() {
@@ -1620,6 +1615,29 @@
       loadCreatedProjects();
       loadJoinedProjects();
       loadAssignedTasks();
+
+      // Event delegation for project lists
+      document.getElementById('createdProjectsList').addEventListener('click', (e) => {
+        const target = e.target;
+        if (target.closest('[data-action="delete"]')) {
+          const projectId = target.closest('[data-action="delete"]').dataset.projectId;
+          confirmDeleteProject(projectId);
+        } else if (target.closest('.project-item')) {
+          const projectId = target.closest('.project-item').dataset.projectId;
+          redirectToProject(projectId);
+        }
+      });
+
+      document.getElementById('joinedProjectsList').addEventListener('click', (e) => {
+        const target = e.target;
+        if (target.closest('[data-action="leave"]')) {
+          const projectId = target.closest('[data-action="leave"]').dataset.projectId;
+          confirmLeaveProject(projectId);
+        } else if (target.closest('.project-item')) {
+          const projectId = target.closest('.project-item').dataset.projectId;
+          redirectToProject(projectId);
+        }
+      });
     });
   </script>
 </body>
