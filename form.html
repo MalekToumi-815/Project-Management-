@@ -72,6 +72,13 @@
     }
     .input:focus, .select:focus { border-color: var(--primary-color); box-shadow: 0 6px 20px rgba(67,97,238,0.12); }
 
+    /* Password visibility toggle */
+    .input-wrap { position: relative; }
+    .has-eye .input { padding-right: 44px; }
+    .eye-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); border: none; background: transparent; color: var(--text-light); cursor: pointer; padding: 6px; border-radius: 8px; transition: var(--transition); }
+    .eye-btn:hover { color: var(--primary-color); transform: translateY(-50%) scale(1.05); }
+    .eye-btn i { font-size: 1rem; }
+
     .actions { display: flex; gap: 12px; align-items: center; }
     .btn { padding: 14px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 10px; transition: var(--transition); }
     .btn-primary { background-color: var(--primary-color); color: #fff; box-shadow: 0 6px 20px rgba(67,97,238,0.25); }
@@ -140,11 +147,17 @@
                 <!-- Row 3: Password / Confirm -->
                 <div class="field">
                   <label class="label" for="mdp">Mot de passe</label>
-                  <input class="input" type="password" id="mdp" name="mdp" placeholder="••••••••" required />
+                  <div class="input-wrap has-eye">
+                    <input class="input" type="password" id="mdp" name="mdp" placeholder="••••••••" required />
+                    <button type="button" class="eye-btn" data-target="mdp" aria-label="Show password"><i class="fas fa-eye"></i></button>
+                  </div>
                 </div>
                 <div class="field">
                   <label class="label" for="confirmPwd">Confirmer le mot de passe</label>
-                  <input class="input" type="password" id="confirmPwd" name="confirmPwd" placeholder="••••••••" required />
+                  <div class="input-wrap has-eye">
+                    <input class="input" type="password" id="confirmPwd" name="confirmPwd" placeholder="••••••••" required />
+                    <button type="button" class="eye-btn" data-target="confirmPwd" aria-label="Show password"><i class="fas fa-eye"></i></button>
+                  </div>
                 </div>
 
                 <!-- Row 4: Terms + Action -->
@@ -181,7 +194,10 @@
                 </div>
                 <div class="field">
                   <label class="label" for="pwd">Password</label>
-                  <input class="input" type="password" id="pwd" name="pwd" placeholder="••••••••" required />
+                  <div class="input-wrap has-eye">
+                    <input class="input" type="password" id="pwd" name="pwd" placeholder="••••••••" required />
+                    <button type="button" class="eye-btn" data-target="pwd" aria-label="Show password"><i class="fas fa-eye"></i></button>
+                  </div>
                 </div>
                 <div class="actions">
                   <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Sign In</button>
@@ -196,6 +212,7 @@
     </div>
   </div>
 
+  <script src="toast.js"></script>
   <script>
     // Flip interactions
     const card = document.getElementById('card');
@@ -218,26 +235,42 @@
     const signupForm = document.getElementById('signupForm');
     const loginForm = document.getElementById('loginForm');
 
+    // Password visibility toggles
+    document.querySelectorAll('.eye-btn').forEach(btn => {
+      const targetId = btn.getAttribute('data-target');
+      const input = document.getElementById(targetId);
+      btn.addEventListener('click', () => {
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        const icon = btn.querySelector('i');
+        if (icon) {
+          icon.classList.toggle('fa-eye', !show);
+          icon.classList.toggle('fa-eye-slash', show);
+        }
+      });
+    });
+
     signupForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const mdp = document.getElementById('mdp').value;
       const confirmPwd = document.getElementById('confirmPwd').value;
       const tosChecked = document.getElementById('tos').checked;
       if (mdp !== confirmPwd) {
-        alert('Passwords do not match.');
+        notify('Passwords do not match.');
         return;
       }
       if (!tosChecked) {
-        alert('Please agree to the Terms of Service.');
+        notify('Please agree to the Terms of Service.');
         return;
       }
-      alert('Account created! (Demo)');
+      notify('Account created! (Demo)');
       setMode('login');
     });
 
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      alert('Signed in! (Demo)');
+      notify('Signed in! (Demo)');
     });
   </script>
 </body>
