@@ -67,10 +67,11 @@
 			try { data = await res.json(); } catch (_) { data = {}; }
 
 			if (res.ok) {
-				// Return id, nom and prenom
+				// Return nom, prenom, and email
 				const user = {
 					nom: data.nom || '',
-					prenom: data.prenom || ''
+					prenom: data.prenom || '',
+					email: data.email || ''
 				};
 				return { ok: true, user, message: 'Profile retrieved' };
 			}
@@ -79,6 +80,78 @@
 			return { ok: false, message, user: null };
 		} catch (err) {
 			return { ok: false, message: 'Network error. Please try again.', user: null };
+		}
+	}
+
+	async function updateProfile(nom, prenom) {
+		const url = 'http://localhost:9090/users/profile';
+		const token = localStorage.getItem('authToken');
+		
+		if (!token) {
+			return { ok: false, message: 'No authentication token found' };
+		}
+
+		try {
+			const res = await fetch(url, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+				body: JSON.stringify({ nom, prenom })
+			});
+
+			let data = null;
+			try { data = await res.json(); } catch (_) { data = {}; }
+
+			if (res.ok) {
+				const message = (data && data.message) ? data.message : 'Profile updated successfully';
+				return { ok: true, message, user: data };
+			}
+
+			const message = (data && data.message) ? data.message : 'Failed to update profile';
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
+	async function updatePassword(oldPassword, newPassword) {
+		const url = 'http://localhost:9090/users/password';
+		const token = localStorage.getItem('authToken');
+		
+		if (!token) {
+			return { ok: false, message: 'No authentication token found' };
+		}
+
+		try {
+			const res = await fetch(url, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+				body: JSON.stringify({ oldPassword, newPassword })
+			});
+
+			let data = null;
+			let text = null;
+			try { 
+				text = await res.text();
+				data = text.length > 0 ? JSON.parse(text) : {};
+			} catch (_) { 
+				data = { message: text || 'Password updated' };
+			}
+
+			if (res.ok) {
+				const message = (data && data.message) ? data.message : 'Password updated successfully';
+				return { ok: true, message };
+			}
+
+			const message = (data && data.message) ? data.message : 'Failed to update password';
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
 		}
 	}
 
@@ -239,11 +312,77 @@
 		}
 	}
 
+	async function deleteProject(projectId) {
+		const url = `http://localhost:9090/projets/${projectId}`;
+		const token = localStorage.getItem('authToken');
+		
+		if (!token) {
+			return { ok: false, message: 'No authentication token found' };
+		}
+
+		try {
+			const res = await fetch(url, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				}
+			});
+
+			const text = await res.text();
+			if (res.ok) {
+				return { ok: true, message: text || 'Project deleted successfully' };
+			}
+
+			// Try to extract error message from JSON, fallback to plain text
+			let message = 'Failed to delete project';
+			try { const data = JSON.parse(text); message = data.message || message; } catch (_) { message = text || message; }
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
+	async function leaveProject(projectId) {
+		const url = `http://localhost:9090/projets/${projectId}/leave`;
+		const token = localStorage.getItem('authToken');
+		
+		if (!token) {
+			return { ok: false, message: 'No authentication token found' };
+		}
+
+		try {
+			const res = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				}
+			});
+
+			const text = await res.text();
+			if (res.ok) {
+				return { ok: true, message: text || 'Successfully left project' };
+			}
+
+			// Try to extract error message from JSON, fallback to plain text
+			let message = 'Failed to leave project';
+			try { const data = JSON.parse(text); message = data.message || message; } catch (_) { message = text || message; }
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
 	window.loginUser = loginUser;
 	window.getUserProfile = getUserProfile;
+	window.updateProfile = updateProfile;
+	window.updatePassword = updatePassword;
 	window.getUserCreatedProjects = getUserCreatedProjects;
 	window.getUserJoinedProjects = getUserJoinedProjects;
 	window.getUserAssignedTasks = getUserAssignedTasks;
 	window.joinProject = joinProject;
 	window.createProject = createProject;
+	window.deleteProject = deleteProject;
+	window.leaveProject = leaveProject;
 })();
