@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workify | Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" type="image/png" href="images/logo.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    
+    :root {
+      --primary: #4361ee;
+      --secondary: #3a0ca3;
+      --light: #eef2ff;
+      --text-dark: #2b2d42;
+      --text-light: #6c757d;
+      --border-color: #f0f0f5;
+      --shadow: 0 4px 12px rgba(0,0,0,0.04);
+      --shadow-hover: 0 8px 20px rgba(0,0,0,0.08);
+      --transition: all 0.3s ease;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at top left, rgba(76,201,240,0.18), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(67,97,238,0.15), transparent 60%),
+        linear-gradient(135deg, #eef2ff, #e6e9ff);
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: white;
+      padding: 20px 40px;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      color: white;
+      font-weight: 700;
+      font-size: 1.3rem;
+    }
+
+    .logo img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+    }
+
+    .brand-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
+      background: var(--light);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .user-menu:hover {
+      background: #e0e7ff;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .logout-btn {
+      padding: 8px 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .logout-btn:hover {
+      background: var(--secondary);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .page-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .page-subtitle {
+      color: var(--text-light);
+      margin-bottom: 30px;
+      font-size: 1.05rem;
+    }
+
+    /* Grid Layout */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      transition: var(--transition);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    }
+
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin-bottom: 16px;
+    }
+
+    .card-icon.blue {
+      background: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+    }
+
+    .card-icon.green {
+      background: rgba(76, 201, 240, 0.1);
+      color: #4cc9f0;
+    }
+
+    .card-icon.purple {
+      background: rgba(58, 12, 163, 0.1);
+      color: var(--secondary);
+    }
+
+    .card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      color: var(--text-light);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .card-footer {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--secondary);
+    }
+
+    .btn-secondary {
+      background: var(--light);
+      color: var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: #e0e7ff;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    /* Full Width Card */
+    .card-full {
+      grid-column: 1 / -1;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .projects-grid .card {
+      grid-column: span 1;
+    }
+
+    .projects-grid .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .projects-grid .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    .projects-grid .card-icon.blue {
+      background: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+    }
+
+    .projects-grid .card-icon.green {
+      background: rgba(76, 201, 240, 0.1);
+      color: #4cc9f0;
+    }
+
+    .projects-grid .card-icon.purple {
+      background: rgba(58, 12, 163, 0.1);
+      color: var(--secondary);
+    }
+
+    .projects-grid h3 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+
+    .projects-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .project-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: var(--light);
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+
+    .project-item:hover {
+      background: #e0e7ff;
+    }
+
+    .project-info {
+      flex: 1;
+    }
+
+    .project-name {
+      font-weight: 500;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    .project-status {
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
+
+    .project-progress {
+      width: 80px;
+      height: 6px;
+      background: #e9ecef;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .project-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      animation: progress 2s ease-out;
+    }
+
+    @keyframes progress {
+      from { width: 0; }
+      to { width: 75%; }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        gap: 16px;
+        padding: 16px 24px;
+      }
+
+      .header-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .page-title {
+        font-size: 1.8rem;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Welcome Animation */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .container {
+      animation: slideIn 0.6s ease-out;
+    }
+
+    /* Join Project Button */
+    .btn-join-project {
+      padding: 12px 28px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .btn-join-project:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(67, 97, 238, 0.4);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      width: 90%;
+      max-width: 500px;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 24px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .close {
+      font-size: 28px;
+      font-weight: 300;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .close:hover {
+      color: var(--text-dark);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: var(--transition);
+    }
+
+    .modal-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 24px 24px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-left">
+      <div class="logo">
+        <img src="images/logo.png" alt="Workify">
+      </div>
+      <div class="brand-name">Workify</div>
+    </div>
+    <div class="header-right">
+      <div class="user-menu">
+        <div class="user-avatar">JD</div>
+        <span>John Doe</span>
+      </div>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+      <div>
+        <h1 class="page-title" id="welcomeTitle">Welcome back! 👋</h1>
+        <p class="page-subtitle">Here's what's happening with your projects today</p>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <button onclick="openCreateProjectModal()" class="btn-join-project">
+          <i class="fas fa-plus"></i> Create Project
+        </button>
+        <button onclick="openJoinProjectModal()" class="btn-join-project">
+          <i class="fas fa-plus"></i> Join Project
+        </button>
+      </div>
+    </div>
+
+    <!-- Projects Grid -->
+    <div class="projects-grid">
+      <!-- Created Projects Section -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">
+            <i class="fas fa-plus-circle"></i>
+          </div>
+          <h3>Projects Created</h3>
+        </div>
+        <div class="projects-list" id="createdProjectsList">
+          <p style="color: var(--text-light); text-align: center; padding: 20px;">Loading projects...</p>
+        </div>
+      </div>
+
+      <!-- Joined Projects Section -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon green">
+            <i class="fas fa-handshake"></i>
+          </div>
+          <h3>Joined Projects</h3>
+        </div>
+        <div class="projects-list" id="joinedProjectsList">
+          <p style="color: var(--text-light); text-align: center; padding: 20px;">Loading projects...</p>
+        </div>
+      </div>
+
+      <!-- Assigned Tasks Section -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon purple">
+            <i class="fas fa-tasks"></i>
+          </div>
+          <h3>Assigned Tasks</h3>
+        </div>
+        <div class="projects-list" id="assignedTasksList">
+          <p style="color: var(--text-light); text-align: center; padding: 20px;">Loading tasks...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Join Project Modal -->
+  <div id="joinProjectModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Join a Project</h2>
+        <span class="close" onclick="closeJoinProjectModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--text-light); margin-bottom: 16px;">Enter the project ID to join a project</p>
+        <input type="text" id="projectIdInput" class="modal-input" placeholder="Enter project ID...">
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeJoinProjectModal()" class="btn btn-secondary">Cancel</button>
+        <button onclick="confirmJoinProject()" class="btn btn-primary">Join Project</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Project Modal -->
+  <div id="createProjectModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Create a New Project</h2>
+        <span class="close" onclick="closeCreateProjectModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 6px; font-weight: 500; color: var(--text-dark);">Project Title</label>
+          <input type="text" id="projectNameInput" class="modal-input" placeholder="Enter project title...">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 6px; font-weight: 500; color: var(--text-dark);">Description</label>
+          <textarea id="projectDescriptionInput" class="modal-input" placeholder="Enter project description..." style="resize: vertical; min-height: 100px; font-family: inherit;"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeCreateProjectModal()" class="btn btn-secondary">Cancel</button>
+        <button onclick="confirmCreateProject()" class="btn btn-primary">Create Project</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="fetch.js"></script>
+  <script src="toast.js"></script>
+ 
+  <script>
+    async function loadUserProfile() {
+      try {
+        if (typeof window.getUserProfile !== 'function') {
+          console.error('getUserProfile function not available');
+          return;
+        }
+
+        const { ok, user } = await window.getUserProfile();
+        if (ok && user) {
+          const welcomeTitle = document.getElementById('welcomeTitle');
+          welcomeTitle.textContent = `Welcome back, ${user.prenom} ${user.nom}! 👋`;
+          
+          const userAvatar = document.querySelector('.user-avatar');
+          if (userAvatar && user.prenom && user.nom) {
+            const initials = (user.prenom.charAt(0) + user.nom.charAt(0)).toUpperCase();
+            userAvatar.textContent = initials;
+          }
+          
+          const userNameSpan = document.querySelector('.user-menu span');
+          if (userNameSpan) {
+            userNameSpan.textContent = `${user.prenom} ${user.nom}`;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user profile:', error);
+      }
+    }
+
+    async function loadCreatedProjects() {
+      try {
+        if (typeof window.getUserCreatedProjects !== 'function') {
+          console.error('getUserCreatedProjects function not available');
+          return;
+        }
+
+        const { ok, projects } = await window.getUserCreatedProjects();
+        const createdProjectsList = document.getElementById('createdProjectsList');
+
+        if (ok && projects && projects.length > 0) {
+          createdProjectsList.innerHTML = '';
+          projects.forEach(project => {
+            const projectItem = document.createElement('div');
+            projectItem.className = 'project-item';
+            
+            // Format date
+            const dateCreation = new Date(project.dateCreation).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            });
+            
+            projectItem.innerHTML = `
+              <div class="project-info">
+                <div class="project-name">${project.nom || 'Untitled'}</div>
+                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 8px;">
+                  <div>${dateCreation}</div>
+                </div>
+              </div>
+              <button class="btn btn-primary" style="margin-left: 16px;"><i class="fas fa-edit"></i> Edit</button>
+            `;
+            createdProjectsList.appendChild(projectItem);
+          });
+        } else {
+          createdProjectsList.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">No created projects</p>';
+        }
+      } catch (error) {
+        console.error('Error loading created projects:', error);
+      }
+    }
+
+    async function loadJoinedProjects() {
+      try {
+        if (typeof window.getUserJoinedProjects !== 'function') {
+          console.error('getUserJoinedProjects function not available');
+          return;
+        }
+
+        const { ok, projects } = await window.getUserJoinedProjects();
+        const joinedProjectsList = document.getElementById('joinedProjectsList');
+
+        if (ok && projects && projects.length > 0) {
+          joinedProjectsList.innerHTML = '';
+          projects.forEach(project => {
+            const projectItem = document.createElement('div');
+            projectItem.className = 'project-item';
+            
+            // Format date
+            const dateCreation = new Date(project.dateCreation).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            });
+            
+            projectItem.innerHTML = `
+              <div class="project-info">
+                <div class="project-name">${project.nom || 'Untitled'}</div>
+                <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 8px;">
+                  <div>By ${project.createurNom || 'Unknown'}</div>
+                  <div>${dateCreation}</div>
+                </div>
+              </div>
+              <button class="btn btn-primary" style="margin-left: 16px;"><i class="fas fa-eye"></i> View</button>
+            `;
+            joinedProjectsList.appendChild(projectItem);
+          });
+        } else {
+          joinedProjectsList.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">No joined projects</p>';
+        }
+      } catch (error) {
+        console.error('Error loading joined projects:', error);
+      }
+    }
+
+    async function loadAssignedTasks() {
+      try {
+        if (typeof window.getUserAssignedTasks !== 'function') {
+          console.error('getUserAssignedTasks function not available');
+          return;
+        }
+
+        const { ok, tasks } = await window.getUserAssignedTasks();
+        const assignedTasksList = document.getElementById('assignedTasksList');
+
+        if (ok && tasks && tasks.length > 0) {
+          assignedTasksList.innerHTML = '';
+          tasks.forEach(task => {
+            const taskItem = document.createElement('div');
+            taskItem.className = 'project-item';
+            
+            // Format deadline
+            const deadline = new Date(task.deadline).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            });
+            
+            // Get priority label and color
+            const priorityLabels = {
+              1: 'Low',
+              2: 'Medium',
+              3: 'High'
+            };
+            const priorityColors = {
+              1: '#10b981',
+              2: '#4361ee',
+              3: '#f97316'
+            };
+            const priorityLabel = priorityLabels[task.priorite] || 'Medium';
+            const priorityColor = priorityColors[task.priorite] || '#4361ee';
+            
+            // Get state badge color (subtle)
+            const stateColors = {
+              'Todo': 'rgba(58, 12, 163, 0.15)',
+              'En progress': 'rgba(249, 115, 22, 0.15)',
+              'En verification': 'rgba(147, 51, 234, 0.15)'
+            };
+            const stateTextColors = {
+              'Todo': '#3a0ca3',
+              'En progress': '#f97316',
+              'En verification': '#9333ea'
+            };
+            const stateBgColor = stateColors[task.etat] || 'rgba(107, 114, 128, 0.15)';
+            const stateTextColor = stateTextColors[task.etat] || '#6c757d';
+            
+            taskItem.innerHTML = `
+              <div class="project-info">
+                <div class="project-name">${task.titre || 'Untitled'}</div>
+                <div style="font-size: 0.8rem; margin-top: 8px;">
+                  <div style="color: white; font-weight: 500;">${task.projectTitre || 'No project'}</div>
+                  <div style="color: rgba(255, 255, 255, 0.9); margin-top: 4px;">Due: ${deadline}</div>
+                  <div style="margin-top: 8px; display: inline-block; padding: 4px 10px; border-radius: 6px; background-color: ${stateBgColor}; color: ${stateTextColor}; font-size: 0.75rem; font-weight: 600;">
+                    ${task.etat || 'Todo'}
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-primary" style="margin-left: 16px;"><i class="fas fa-tasks"></i> Details</button>
+            `;
+            taskItem.style.backgroundColor = priorityColor;
+            taskItem.style.color = 'white';
+            taskItem.style.borderLeft = `4px solid ${priorityColor}`;
+            assignedTasksList.appendChild(taskItem);
+          });
+        } else {
+          assignedTasksList.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">No assigned tasks</p>';
+        }
+      } catch (error) {
+        console.error('Error loading assigned tasks:', error);
+      }
+    }
+
+    function openJoinProjectModal() {
+      const modal = document.getElementById('joinProjectModal');
+      modal.classList.add('show');
+      document.getElementById('projectIdInput').focus();
+    }
+
+    function closeJoinProjectModal() {
+      const modal = document.getElementById('joinProjectModal');
+      modal.classList.remove('show');
+      document.getElementById('projectIdInput').value = '';
+    }
+
+    function openCreateProjectModal() {
+      const modal = document.getElementById('createProjectModal');
+      modal.classList.add('show');
+      document.getElementById('projectNameInput').focus();
+    }
+
+    function closeCreateProjectModal() {
+      const modal = document.getElementById('createProjectModal');
+      modal.classList.remove('show');
+      document.getElementById('projectNameInput').value = '';
+      document.getElementById('projectDescriptionInput').value = '';
+    }
+
+    async function confirmCreateProject() {
+      const projectName = document.getElementById('projectNameInput').value.trim();
+      const projectDescription = document.getElementById('projectDescriptionInput').value.trim();
+      
+      if (!projectName) {
+        notify('❌ Please enter a project title', 3000);
+        return;
+      }
+
+      if (!projectDescription) {
+        notify('❌ Please enter a project description', 3000);
+        return;
+      }
+
+      try {
+        if (typeof window.createProject !== 'function') {
+          console.error('createProject function not available');
+          notify('❌ Create project function not available', 3000);
+          return;
+        }
+
+        const { ok, message, project } = await window.createProject(projectName, projectDescription);
+        
+        if (ok) {
+          notify('✅ ' + message, 3000);
+          closeCreateProjectModal();
+          
+          // Add the new project to the list immediately
+          if (project) {
+            addProjectToList(project);
+          } else {
+            // If no project data returned, reload the entire list
+            loadCreatedProjects();
+          }
+        } else {
+          notify('❌ ' + message, 3000);
+        }
+      } catch (error) {
+        console.error('Error creating project:', error);
+        notify('❌ An error occurred while creating the project', 3000);
+      }
+    }
+
+    function addProjectToList(project) {
+      const createdProjectsList = document.getElementById('createdProjectsList');
+      
+      // Clear "No projects" message if it exists
+      if (createdProjectsList.innerHTML.includes('No created projects')) {
+        createdProjectsList.innerHTML = '';
+      }
+      
+      const projectItem = document.createElement('div');
+      projectItem.className = 'project-item';
+      
+      // Format date
+      const dateCreation = new Date(project.dateCreation).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+      
+      projectItem.innerHTML = `
+        <div class="project-info">
+          <div class="project-name">${project.nom || 'Untitled'}</div>
+          <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 8px;">
+            <div>${dateCreation}</div>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="margin-left: 16px;"><i class="fas fa-edit"></i> Edit</button>
+      `;
+      
+      // Add as first item in the list
+      createdProjectsList.insertBefore(projectItem, createdProjectsList.firstChild);
+    }
+
+    async function confirmJoinProject() {
+      const projectId = document.getElementById('projectIdInput').value.trim();
+      
+      if (!projectId) {
+        notify('❌ Please enter a project ID', 3000);
+        return;
+      }
+
+      try {
+        if (typeof window.joinProject !== 'function') {
+          console.error('joinProject function not available');
+          notify('❌ Join project function not available', 3000);
+          return;
+        }
+
+        const { ok, message } = await window.joinProject(projectId);
+        
+        if (ok) {
+          notify('✅ ' + message, 3000);
+          closeJoinProjectModal();
+          // Reload joined projects to update the list
+          loadJoinedProjects();
+        } else {
+          notify('❌ ' + message, 3000);
+        }
+      } catch (error) {
+        console.error('Error joining project:', error);
+        notify('❌ An error occurred while joining the project', 3000);
+      }
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+      const joinModal = document.getElementById('joinProjectModal');
+      const createModal = document.getElementById('createProjectModal');
+      if (event.target === joinModal) {
+        closeJoinProjectModal();
+      }
+      if (event.target === createModal) {
+        closeCreateProjectModal();
+      }
+    }
+
+    // Allow Enter key to submit
+    document.addEventListener('keypress', function(event) {
+      const joinModal = document.getElementById('joinProjectModal');
+      const createModal = document.getElementById('createProjectModal');
+      if (joinModal.classList.contains('show') && event.key === 'Enter') {
+        confirmJoinProject();
+      }
+      if (createModal.classList.contains('show') && event.key === 'Enter') {
+        confirmCreateProject();
+      }
+    });
+     
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUserProfile();
+      loadCreatedProjects();
+      loadJoinedProjects();
+      loadAssignedTasks();
+    });
+  </script>
+</body>
+</html>
