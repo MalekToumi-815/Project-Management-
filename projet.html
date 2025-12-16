@@ -256,6 +256,31 @@
       gap: 10px;
       margin-top: 24px;
     }
+
+    /* Task Card */
+    .task-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      border-left: 5px solid var(--primary-color);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .task-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.09);
+    }
+    .task-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-dark);
+    }
+    .task-deadline {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
   </style>
 </head>
 <body>
@@ -287,19 +312,19 @@
       <section class="board">
         <div class="list">
           <div class="list-header todo"><i class="fas fa-list"></i> Todo</div>
-          <div class="list-content">No tasks yet.</div>
+          <div class="list-content" id="list-content-todo">No tasks yet.</div>
         </div>
         <div class="list">
           <div class="list-header progress"><i class="fas fa-spinner"></i> en progres</div>
-          <div class="list-content">Add tasks to start progress.</div>
+          <div class="list-content" id="list-content-progress">Add tasks to start progress.</div>
         </div>
         <div class="list">
           <div class="list-header verify"><i class="fas fa-search"></i> en verification</div>
-          <div class="list-content">Awaiting review.</div>
+          <div class="list-content" id="list-content-verify">Awaiting review.</div>
         </div>
         <div class="list">
           <div class="list-header done"><i class="fas fa-check"></i> terminee</div>
-          <div class="list-content">Completed tasks appear here.</div>
+          <div class="list-content" id="list-content-done">Completed tasks appear here.</div>
         </div>
       </section>
     </div>
@@ -378,6 +403,7 @@
       let projectMembers = []; // Cache for members
       let chatMessages = []; // Cache for chat messages
       let chatInterval = null; // To hold the interval ID
+      let projectTasks = []; // Cache for tasks
 
       try {
         const { ok, data, message } = await getProject(projectId);
@@ -402,6 +428,66 @@
         }
       } catch (e) {
         notify('Error loading project');
+      }
+
+      // Task rendering logic
+      const priorityColors = {
+        1: '#10b981', // Low
+        2: '#4361ee', // Medium
+        3: '#f97316'  // High
+      };
+
+      const taskColumns = {
+        'Todo': document.getElementById('list-content-todo'),
+        'en progres': document.getElementById('list-content-progress'),
+        'en verification': document.getElementById('list-content-verify'),
+        'terminee': document.getElementById('list-content-done')
+      };
+
+      const renderTasks = () => {
+        // Clear all columns
+        Object.values(taskColumns).forEach(col => {
+          col.innerHTML = '';
+        });
+
+        projectTasks.forEach(task => {
+          const column = taskColumns[task.etat];
+          if (!column) return;
+
+          const card = document.createElement('div');
+          card.className = 'task-card';
+          card.style.borderLeftColor = priorityColors[task.priorite] || '#ccc';
+          
+          const deadline = new Date(task.deadline);
+          const deadlineFormatted = `${String(deadline.getDate()).padStart(2, '0')}/${String(deadline.getMonth() + 1).padStart(2, '0')}/${deadline.getFullYear()}`;
+
+          card.innerHTML = `
+            <div class="task-title">${task.titre}</div>
+            <div class="task-deadline">Deadline: ${deadlineFormatted}</div>
+          `;
+          column.appendChild(card);
+        });
+
+        // Add placeholder if a column is empty
+        Object.values(taskColumns).forEach(col => {
+          if (col.children.length === 0) {
+            col.textContent = 'No tasks in this stage.';
+            col.style.color = 'var(--text-light)';
+          }
+        });
+      };
+
+      // Fetch tasks
+      try {
+        const { ok, data, message } = await getProjectTasks(projectId);
+        if (ok) {
+          projectTasks = data || [];
+          renderTasks();
+        } else {
+          notify(message || 'Could not load tasks');
+        }
+      } catch (e) {
+        notify('Error loading tasks');
       }
 
       // Sidebar elements and logic
