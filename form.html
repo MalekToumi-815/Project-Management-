@@ -200,8 +200,7 @@
                   </div>
                 </div>
                 <div class="actions">
-                  <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Sign In</button>
-                  <a class="link" href="#">Forgot password?</a>
+                  <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Log In</button>
                 </div>
                 <p class="switch">New here? <a class="link" id="linkSignup">Create account</a></p>
               </form>
@@ -213,6 +212,7 @@
   </div>
 
   <script src="toast.js"></script>
+  <script src="fetch.js"></script>
   <script>
     // Flip interactions
     const card = document.getElementById('card');
@@ -251,11 +251,19 @@
       });
     });
 
-    signupForm.addEventListener('submit', (e) => {
+    signupForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (!signupForm.reportValidity()) {
+        notify('Please fill all required fields.');
+        return;
+      }
+      const prenom = document.getElementById('prenom').value.trim();
+      const nom = document.getElementById('nom').value.trim();
+      const email = document.getElementById('email').value.trim();
       const mdp = document.getElementById('mdp').value;
       const confirmPwd = document.getElementById('confirmPwd').value;
       const tosChecked = document.getElementById('tos').checked;
+
       if (mdp !== confirmPwd) {
         notify('Passwords do not match.');
         return;
@@ -264,13 +272,51 @@
         notify('Please agree to the Terms of Service.');
         return;
       }
-      notify('Account created! (Demo)');
-      setMode('login');
+
+      const btn = signupForm.querySelector('button[type="submit"]');
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+      try {
+        const { ok, message } = await createUser(nom, prenom, email, mdp);
+        notify(message);
+        if (ok) setMode('login');
+      } catch (_) {
+        notify('Unable to sign up. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
     });
 
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      notify('Signed in! (Demo)');
+      if (!loginForm.reportValidity()) {
+        notify('Please fill all required fields.');
+        return;
+      }
+      const email = document.getElementById('loginEmail').value.trim();
+      const pwd = document.getElementById('pwd').value;
+
+      const btn = loginForm.querySelector('button[type="submit"]');
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+      try {
+        const { ok, token, message } = await loginUser(email, pwd);
+        if (ok) {
+          console.log('JWT token:', token);
+          localStorage.setItem('authToken', token);
+          notify('Loged in!');
+        } else {
+          notify(message || 'Login failed');
+        }
+      } catch (_) {
+        notify('Unable to login in. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
     });
   </script>
 </body>
