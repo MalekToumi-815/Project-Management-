@@ -312,6 +312,10 @@
           console.log('JWT token:', token);
           localStorage.setItem('authToken', token);
           notify('Loged in!');
+          // Redirect to home page
+          setTimeout(() => {
+            window.location.href = 'home.html';
+          }, 1500);
         } else {
           notify(message || 'Login failed');
         }

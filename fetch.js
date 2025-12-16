@@ -295,8 +295,345 @@
 		}
 	}
 
-	window.createUser = createUser;
+	async function getUserProfile() {
+		const url = 'http://localhost:9090/users/profile';
+		const token = localStorage.getItem('authToken');
+		
+		if (!token) {
+			return { ok: false, message: 'No authentication token found', user: null };
+		}
+
+		try {
+			const res = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				}
+			});
+
+			let data = null;
+			try { data = await res.json(); } catch (_) { data = {}; }
+
+			if (res.ok) {
+				// Return nom, prenom, and email
+				const user = {
+					nom: data.nom || '',
+					prenom: data.prenom || '',
+					email: data.email || ''
+				};
+				return { ok: true, user, message: 'Profile retrieved' };
+			}
+
+			const message = (data && data.message) ? data.message : 'Failed to retrieve profile';
+			return { ok: false, message, user: null };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.', user: null };
+		}
+	}
+
+	async function updateProfile(nom, prenom) {
+		const url = 'http://localhost:9090/users/profile';
+		const token = localStorage.getItem('authToken');
+		
+		if (!token) {
+			return { ok: false, message: 'No authentication token found' };
+		}
+
+		try {
+			const res = await fetch(url, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+				body: JSON.stringify({ nom, prenom })
+			});
+
+			let data = null;
+			try { data = await res.json(); } catch (_) { data = {}; }
+
+			if (res.ok) {
+				const message = (data && data.message) ? data.message : 'Profile updated successfully';
+				return { ok: true, message, user: data };
+			}
+
+			const message = (data && data.message) ? data.message : 'Failed to update profile';
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
+	async function updatePassword(oldPassword, newPassword) {
+		const url = 'http://localhost:9090/users/password';
+		const token = localStorage.getItem('authToken');
+		
+		if (!token) {
+			return { ok: false, message: 'No authentication token found' };
+		}
+
+		try {
+			const res = await fetch(url, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+				body: JSON.stringify({ oldPassword, newPassword })
+			});
+
+			let data = null;
+			let text = null;
+			try { 
+				text = await res.text();
+				data = text.length > 0 ? JSON.parse(text) : {};
+			} catch (_) { 
+				data = { message: text || 'Password updated' };
+			}
+
+			if (res.ok) {
+				const message = (data && data.message) ? data.message : 'Password updated successfully';
+				return { ok: true, message };
+			}
+
+			const message = (data && data.message) ? data.message : 'Failed to update password';
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
+	async function getUserCreatedProjects() {
+		const url = 'http://localhost:9090/users/projets-created';
+		const token = localStorage.getItem('authToken');
+		
+		if (!token) {
+			return { ok: false, message: 'No authentication token found', projects: [] };
+		}
+
+		try {
+			const res = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				}
+			});
+
+			let data = null;
+			try { data = await res.json(); } catch (_) { data = []; }
+
+			if (res.ok) {
+				return { ok: true, projects: data || [], message: 'Projects retrieved' };
+			}
+
+			const message = (data && data.message) ? data.message : 'Failed to retrieve projects';
+			return { ok: false, message, projects: [] };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.', projects: [] };
+		}
+	}
+
+	async function getUserJoinedProjects() {
+		const url = 'http://localhost:9090/users/projets-joined';
+		const token = localStorage.getItem('authToken');
+		
+		if (!token) {
+			return { ok: false, message: 'No authentication token found', projects: [] };
+		}
+
+		try {
+			const res = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				}
+			});
+
+			let data = null;
+			try { data = await res.json(); } catch (_) { data = []; }
+
+			if (res.ok) {
+				return { ok: true, projects: data || [], message: 'Projects retrieved' };
+			}
+
+			const message = (data && data.message) ? data.message : 'Failed to retrieve projects';
+			return { ok: false, message, projects: [] };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.', projects: [] };
+		}
+	}
+
+	async function getUserAssignedTasks() {
+		const url = 'http://localhost:9090/users/taches-assignees';
+		const token = localStorage.getItem('authToken');
+		
+		if (!token) {
+			return { ok: false, message: 'No authentication token found', tasks: [] };
+		}
+
+		try {
+			const res = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				}
+			});
+
+			let data = null;
+			try { data = await res.json(); } catch (_) { data = []; }
+
+			if (res.ok) {
+				return { ok: true, tasks: data || [], message: 'Tasks retrieved' };
+			}
+
+			const message = (data && data.message) ? data.message : 'Failed to retrieve tasks';
+			return { ok: false, message, tasks: [] };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.', tasks: [] };
+		}
+	}
+
+	async function joinProject(projectId) {
+		const url = `http://localhost:9090/projets/${projectId}/join`;
+		const token = localStorage.getItem('authToken');
+		
+		if (!token) {
+			return { ok: false, message: 'No authentication token found' };
+		}
+
+		try {
+			const res = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				}
+			});
+
+			const text = await res.text();
+			if (res.ok) {
+				return { ok: true, message: text || 'Successfully joined project' };
+			}
+
+			// Try to extract error message from JSON, fallback to plain text
+			let message = 'Failed to join project';
+			try { const data = JSON.parse(text); message = data.message || message; } catch (_) { message = text || message; }
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
+	async function createProject(nom, description) {
+		const url = 'http://localhost:9090/projets';
+		const token = localStorage.getItem('authToken');
+		
+		if (!token) {
+			return { ok: false, message: 'No authentication token found' };
+		}
+
+		try {
+			const res = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+				body: JSON.stringify({ nom, description })
+			});
+
+			let data = null;
+			try { data = await res.json(); } catch (_) { data = {}; }
+
+			if (res.ok) {
+				const message = (data && data.message) ? data.message : 'Project created successfully';
+				return { ok: true, message, project: data };
+			}
+
+			const message = (data && data.message) ? data.message : 'Failed to create project';
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
+	async function deleteProject(projectId) {
+		const url = `http://localhost:9090/projets/${projectId}`;
+		const token = localStorage.getItem('authToken');
+		
+		if (!token) {
+			return { ok: false, message: 'No authentication token found' };
+		}
+
+		try {
+			const res = await fetch(url, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				}
+			});
+
+			const text = await res.text();
+			if (res.ok) {
+				return { ok: true, message: text || 'Project deleted successfully' };
+			}
+
+			// Try to extract error message from JSON, fallback to plain text
+			let message = 'Failed to delete project';
+			try { const data = JSON.parse(text); message = data.message || message; } catch (_) { message = text || message; }
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
+	async function leaveProject(projectId) {
+		const url = `http://localhost:9090/projets/${projectId}/leave`;
+		const token = localStorage.getItem('authToken');
+		
+		if (!token) {
+			return { ok: false, message: 'No authentication token found' };
+		}
+
+		try {
+			const res = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				}
+			});
+
+			const text = await res.text();
+			if (res.ok) {
+				return { ok: true, message: text || 'Successfully left project' };
+			}
+
+			// Try to extract error message from JSON, fallback to plain text
+			let message = 'Failed to leave project';
+			try { const data = JSON.parse(text); message = data.message || message; } catch (_) { message = text || message; }
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
 	window.loginUser = loginUser;
+	window.getUserProfile = getUserProfile;
+	window.updateProfile = updateProfile;
+	window.updatePassword = updatePassword;
+	window.getUserCreatedProjects = getUserCreatedProjects;
+	window.getUserJoinedProjects = getUserJoinedProjects;
+	window.getUserAssignedTasks = getUserAssignedTasks;
+	window.joinProject = joinProject;
+	window.createProject = createProject;
+	window.deleteProject = deleteProject;
+	window.leaveProject = leaveProject;
 	window.getProject = getProject;
 	window.getProjectTasks = getProjectTasks;
 	window.getProjectMembers = getProjectMembers;
