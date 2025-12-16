@@ -281,6 +281,12 @@
       font-size: 0.85rem;
       color: var(--text-light);
     }
+    .task-card.dragging {
+      opacity: 0.5;
+    }
+    .list-content.drag-over {
+      background: rgba(67, 97, 238, 0.05);
+    }
   </style>
 </head>
 <body>
@@ -456,6 +462,8 @@
 
           const card = document.createElement('div');
           card.className = 'task-card';
+          card.draggable = true;
+          card.dataset.taskId = task.id;
           card.style.borderLeftColor = priorityColors[task.priorite] || '#ccc';
           
           const deadline = new Date(task.deadline);
@@ -688,6 +696,64 @@
             renderMembers();
           }
         }
+      });
+
+      // Drag and Drop for Tasks
+      const board = document.querySelector('.board');
+      let draggedTaskId = null;
+
+      board.addEventListener('dragstart', (e) => {
+        if (e.target.classList.contains('task-card')) {
+          draggedTaskId = e.target.dataset.taskId;
+          // Add a class to the dragged element for visual feedback
+          setTimeout(() => e.target.classList.add('dragging'), 0);
+        }
+      });
+
+      board.addEventListener('dragend', (e) => {
+        if (e.target.classList.contains('task-card')) {
+          e.target.classList.remove('dragging');
+          draggedTaskId = null;
+        }
+      });
+
+      Object.entries(taskColumns).forEach(([state, columnEl]) => {
+        columnEl.addEventListener('dragover', (e) => {
+          e.preventDefault(); // Allow dropping
+          columnEl.classList.add('drag-over');
+        });
+
+        columnEl.addEventListener('dragleave', () => {
+          columnEl.classList.remove('drag-over');
+        });
+
+        columnEl.addEventListener('drop', async (e) => {
+          e.preventDefault();
+          columnEl.classList.remove('drag-over');
+          if (!draggedTaskId) return;
+
+          const newState = state;
+          const task = projectTasks.find(t => String(t.id) === draggedTaskId);
+          if (!task || task.etat === newState) return;
+
+          const oldState = task.etat;
+
+          // Optimistically update the UI
+          task.etat = newState;
+          renderTasks();
+
+          // Call the API to update the state
+          const { ok, message } = await updateTaskState(draggedTaskId, newState);
+
+          if (!ok) {
+            // If the API call fails, revert the change in the UI
+            task.etat = oldState;
+            renderTasks();
+            notify(message || 'Failed to update task status.');
+          } else {
+            notify('Task status updated!');
+          }
+        });
       });
     });
   </script>

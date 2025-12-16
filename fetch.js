@@ -240,6 +240,37 @@
 		}
 	}
 
+	// PATCH /taches/{id}/etat — changer l’état (créateur seul pour "terminee")
+	async function updateTaskState(taskId, newState) {
+		const url = `http://localhost:9090/taches/${encodeURIComponent(taskId)}/etat`;
+		try {
+			const res = await fetch(url, {
+				method: 'PATCH',
+				headers: withAuth({ 'Content-Type': 'application/json' }),
+				body: JSON.stringify({ etat: newState })
+			});
+
+			const text = await res.text();
+			if (res.ok) {
+				let data = null;
+				try { data = text ? JSON.parse(text) : null; } catch (_) { data = null; }
+				return { ok: true, data };
+			}
+
+			let message = 'Failed to update task state';
+			try {
+				const err = text ? JSON.parse(text) : null;
+				if (err && err.message) message = err.message;
+				else if (text) message = text;
+			} catch (_) {
+				if (text) message = text;
+			}
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
 	window.createUser = createUser;
 	window.loginUser = loginUser;
 	window.getProject = getProject;
@@ -249,4 +280,5 @@
 	window.kickMember = kickMember;
 	window.sendMessage = sendMessage;
 	window.updateProject = updateProject;
+	window.updateTaskState = updateTaskState;
 })();
