@@ -792,4 +792,5 @@
 	window.getTask = getTask;
 	window.deleteTask = deleteTask;
 	window.assignTaskMembers = assignTaskMembers;
+	window.createUser = createUser;
 })();

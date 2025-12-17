@@ -1173,25 +1173,32 @@
 
       const assignSelectedMembers = async () => {
         const checkboxes = assignmentList.querySelectorAll('.assignment-checkbox');
-        const selectedUserIds = [];
+        const newlySelectedUserIds = [];
         
         checkboxes.forEach(cb => {
           if (cb.checked) {
-            selectedUserIds.push(parseInt(cb.dataset.userId));
+            newlySelectedUserIds.push(parseInt(cb.dataset.userId));
           }
         });
 
-        if (selectedUserIds.length === 0) {
+        if (newlySelectedUserIds.length === 0) {
           notify('❌ Please select at least one member');
           return;
         }
+
+        // Get current task and its existing assignees
+        const task = projectTasks.find(t => String(t.id) === String(currentTaskId));
+        const existingAssigneeIds = (task.assignees || []).map(a => parseInt(a.id));
+        
+        // Combine existing assignees with newly selected ones
+        const allAssigneeIds = [...new Set([...existingAssigneeIds, ...newlySelectedUserIds])];
 
         if (typeof window.showLoading === 'function') {
           window.showLoading('Updating assignments...');
         }
 
         try {
-          const { ok, message } = await assignTaskMembers(currentTaskId, selectedUserIds);
+          const { ok, message } = await assignTaskMembers(currentTaskId, allAssigneeIds);
           
           if (typeof window.hideLoading === 'function') {
             window.hideLoading();
@@ -1200,13 +1207,13 @@
           if (ok) {
             notify('✅ Members assigned successfully');
             
-            // Update local cache with selected members
+            // Update local cache with all assigned members
             const taskIndex = projectTasks.findIndex(t => String(t.id) === String(currentTaskId));
             if (taskIndex !== -1) {
-              const selectedMembers = projectMembers.filter(m => 
-                selectedUserIds.includes(parseInt(m.id))
+              const allAssignedMembers = projectMembers.filter(m => 
+                allAssigneeIds.includes(parseInt(m.id))
               );
-              projectTasks[taskIndex].assignees = selectedMembers;
+              projectTasks[taskIndex].assignees = allAssignedMembers;
             }
             
             // Refresh display
