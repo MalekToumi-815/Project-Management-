@@ -393,6 +393,43 @@
     </div>
   </div>
 
+  <!-- Create Task Dialog -->
+  <div class="dialog-backdrop" id="createTaskDialog">
+    <div class="dialog">
+      <div class="dialog-header">
+        <h3 class="dialog-title">Create New Task</h3>
+        <i class="fas fa-times dialog-close" id="closeCreateTaskDialog"></i>
+      </div>
+      <form id="createTaskForm" class="dialog-form">
+        <div class="form-group">
+          <label for="taskTitle">Task Title</label>
+          <input type="text" id="taskTitle" class="form-control" placeholder="Enter task title" required />
+        </div>
+        <div class="form-group">
+          <label for="taskDescription">Description</label>
+          <textarea id="taskDescription" class="form-control" rows="3" placeholder="Enter task description"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="taskDeadline">Deadline</label>
+          <input type="datetime-local" id="taskDeadline" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label for="taskPriority">Priority</label>
+          <select id="taskPriority" class="form-control" required>
+            <option value="">Select priority</option>
+            <option value="1">Low (1)</option>
+            <option value="2">Medium (2)</option>
+            <option value="3">High (3)</option>
+          </select>
+        </div>
+        <div class="dialog-actions">
+          <button type="button" class="btn" id="cancelCreateTask">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="toast.js"></script>
   <script src="fetch.js"></script>
   <script>
@@ -689,13 +726,100 @@
         }
       });
 
+      // Create Task Dialog
+      const createTaskDialog = document.getElementById('createTaskDialog');
+      const closeCreateTaskDialog = document.getElementById('closeCreateTaskDialog');
+      const cancelCreateTask = document.getElementById('cancelCreateTask');
+      const createTaskForm = document.getElementById('createTaskForm');
+      const taskTitle = document.getElementById('taskTitle');
+      const taskDescription = document.getElementById('taskDescription');
+      const taskDeadline = document.getElementById('taskDeadline');
+      const taskPriority = document.getElementById('taskPriority');
+
+      const openCreateTaskDialog = () => createTaskDialog.classList.add('open');
+      const closeTaskDialog = () => {
+        createTaskDialog.classList.remove('open');
+        createTaskForm.reset();
+      };
+
+      closeCreateTaskDialog.addEventListener('click', closeTaskDialog);
+      cancelCreateTask.addEventListener('click', closeTaskDialog);
+
+      createTaskForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        console.log('Create task form submitted');
+        
+        const titre = taskTitle.value.trim();
+        const description = taskDescription.value.trim();
+        const deadline = taskDeadline.value;
+        const priorite = parseInt(taskPriority.value);
+
+        console.log('Form values:', { titre, description, deadline, priorite, projectId });
+
+        if (!titre) {
+          notify('❌ Please enter a task title');
+          return;
+        }
+
+        if (!deadline) {
+          notify('❌ Please select a deadline');
+          return;
+        }
+
+        if (!priorite || isNaN(priorite)) {
+          notify('❌ Please select a priority');
+          return;
+        }
+
+        if (!projectId) {
+          notify('❌ Project ID not available');
+          return;
+        }
+
+        // Convert datetime-local to ISO format
+        const deadlineISO = new Date(deadline).toISOString();
+        console.log('Deadline ISO:', deadlineISO);
+
+        if (typeof window.showLoading === 'function') {
+          window.showLoading('Creating task...');
+        }
+        
+        try {
+          console.log('Calling createTask...');
+          const { ok, data, message } = await createTask(projectId, titre, description, deadlineISO, priorite);
+          console.log('createTask response:', { ok, data, message });
+          
+          if (typeof window.hideLoading === 'function') {
+            window.hideLoading();
+          }
+          
+          if (ok) {
+            notify('✅ Task created successfully');
+            closeTaskDialog();
+            // Reload tasks to show the new one
+            const { ok: tasksOk, data: tasksData } = await getProjectTasks(projectId);
+            if (tasksOk) {
+              projectTasks = tasksData || [];
+              renderTasks();
+            }
+          } else {
+            notify('❌ ' + (message || 'Failed to create task'));
+          }
+        } catch (error) {
+          if (typeof window.hideLoading === 'function') {
+            window.hideLoading();
+          }
+          console.error('Error creating task:', error);
+          notify('❌ An error occurred while creating the task');
+        }
+      });
+
       // Header controls interactions
       const btnCreate = document.getElementById('btnCreateTask');
       const btnMembers = document.getElementById('btnMembers');
       const btnChat = document.getElementById('btnChat');
-      btnCreate.addEventListener('click', () => {
-        notify('Create Task clicked');
-      });
+      
+      btnCreate.addEventListener('click', openCreateTaskDialog);
 
       btnMembers.addEventListener('click', async () => {
         if (!projectId) return;

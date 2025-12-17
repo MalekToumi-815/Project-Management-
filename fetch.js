@@ -271,7 +271,36 @@
 		}
 	}
 
+	// POST /taches/{projetId} — créer une tâche
+	async function createTask(projetId, titre, description, deadline, priorite) {
+		const url = `http://localhost:9090/taches/${encodeURIComponent(projetId)}`;
+		try {
+			const res = await fetch(url, {
+				method: 'POST',
+				headers: withAuth({ 'Content-Type': 'application/json' }),
+				body: JSON.stringify({ titre, description, deadline, priorite })
+			});
 
+			const text = await res.text();
+			if (res.ok) {
+				let data = null;
+				try { data = text ? JSON.parse(text) : null; } catch (_) { data = null; }
+				return { ok: true, data, message: 'Task created successfully' };
+			}
+
+			let message = 'Failed to create task';
+			try {
+				const err = text ? JSON.parse(text) : null;
+				if (err && err.message) message = err.message;
+				else if (text) message = text;
+			} catch (_) {
+				if (text) message = text;
+			}
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
 
 	// GET /users/profile — profil utilisateur (auth)
 	async function getUserProfileproject() {
@@ -646,5 +675,4 @@
 	window.updateProject = updateProject;
 	window.updateTaskState = updateTaskState;
 	window.createTask = createTask;
-	window.getUserProfile = getUserProfile;
 })();
