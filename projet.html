@@ -287,6 +287,208 @@
     .list-content.drag-over {
       background: rgba(67, 97, 238, 0.05);
     }
+
+    /* Task Details Sidebar */
+    .task-details-sidebar {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      width: 500px;
+      max-width: 90vw;
+      max-height: 85vh;
+      background: #fff;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.2);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      z-index: 1100;
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .task-details-sidebar.open { 
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+      pointer-events: all;
+    }
+    .task-details-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-color);
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border-radius: 12px 12px 0 0;
+    }
+    .task-details-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .task-delete-btn {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: white;
+      opacity: 0.9;
+    }
+    .task-delete-btn:hover { opacity: 1; color: #fee; }
+    .task-details-title { font-size: 1.2rem; font-weight: 700; }
+    .task-details-close { font-size: 1.5rem; cursor: pointer; color: white; opacity: 0.9; }
+    .task-details-close:hover { opacity: 1; }
+    .task-details-header .edit-icon { 
+      font-size: 1.5rem; 
+      cursor: pointer; 
+      color: white; 
+      opacity: 0.9;
+      margin-right: 0 !important;
+    }
+    .task-details-header .edit-icon:hover { opacity: 1; color: white; }
+    .task-details-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .task-main-content { display: flex; flex-direction: column; gap: 16px; }
+    .task-field {
+      padding: 12px;
+      background: var(--light);
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+    }
+    .task-field-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .task-field-value {
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      word-break: break-word;
+    }
+    .task-field-input {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      border: 2px solid var(--primary-color);
+      border-radius: 6px;
+      font-family: inherit;
+      background: white;
+      color: var(--text-dark);
+    }
+    .task-field-textarea {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      border: 2px solid var(--primary-color);
+      border-radius: 6px;
+      font-family: inherit;
+      background: white;
+      color: var(--text-dark);
+      resize: vertical;
+      min-height: 80px;
+    }
+    .edit-icon {
+      cursor: pointer;
+      color: var(--primary-color);
+      font-size: 0.9rem;
+    }
+    .edit-icon:hover { color: var(--secondary-color); }
+    .task-state-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .task-state-todo { background: #dbeafe; color: #1e40af; }
+    .task-state-progress { background: #fed7aa; color: #c2410c; }
+    .task-state-verify { background: #e9d5ff; color: #6b21a8; }
+    .task-state-done { background: #d1fae5; color: #065f46; }
+    .task-priority-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .task-priority-1 { background: #d1fae5; color: #065f46; }
+    .task-priority-2 { background: #dbeafe; color: #1e40af; }
+    .task-priority-3 { background: #fee2e2; color: #991b1b; }
+    .task-assignees {
+      border-top: 2px solid var(--border-color);
+      padding-top: 16px;
+    }
+    .assignees-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 12px;
+    }
+    #taskAssigneesList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .assignee-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: var(--light);
+    }
+    .assignee-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    .assignee-name {
+      font-size: 0.9rem;
+      color: var(--text-dark);
+    }
+    .task-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .btn-save {
+      background: #10b981;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-save:hover { background: #059669; }
+    .btn-cancel {
+      background: #ef4444;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-cancel:hover { background: #dc2626; }
   </style>
 </head>
 <body>
@@ -430,6 +632,71 @@
     </div>
   </div>
 
+  <!-- Task Details Sidebar -->
+  <aside class="task-details-sidebar" id="taskDetailsSidebar">
+    <div class="task-details-header">
+      <h3 class="task-details-title">Task Details</h3>
+      <div class="task-details-header-actions">
+        <i class="fas fa-trash task-delete-btn" id="deleteTaskBtn" title="Delete task"></i>
+        <i class="fas fa-edit edit-icon" id="editTaskIcon" title="Edit task"></i>
+        <i class="fas fa-times task-details-close" id="closeTaskDetails"></i>
+      </div>
+    </div>
+    <div class="task-details-body">
+      <div class="task-main-content">
+        <div class="task-field">
+          <div class="task-field-label">Title</div>
+          <div class="task-field-value" id="taskDetailTitle"></div>
+          <input type="text" class="task-field-input" id="taskDetailTitleInput" style="display: none;" />
+        </div>
+
+        <div class="task-field">
+          <div class="task-field-label">Description</div>
+          <div class="task-field-value" id="taskDetailDescription"></div>
+          <textarea class="task-field-textarea" id="taskDetailDescriptionInput" style="display: none;"></textarea>
+        </div>
+
+        <div class="task-field">
+          <div class="task-field-label">Deadline</div>
+          <div class="task-field-value" id="taskDetailDeadline"></div>
+          <input type="datetime-local" class="task-field-input" id="taskDetailDeadlineInput" style="display: none;" />
+        </div>
+
+        <div class="task-field">
+          <div class="task-field-label">Priority</div>
+          <div class="task-field-value" id="taskDetailPriority"></div>
+          <select class="task-field-input" id="taskDetailPriorityInput" style="display: none;">
+            <option value="1">Low</option>
+            <option value="2">Medium</option>
+            <option value="3">High</option>
+          </select>
+        </div>
+
+        <div class="task-field">
+          <div class="task-field-label">State</div>
+          <div class="task-field-value" id="taskDetailState"></div>
+        </div>
+
+        <div class="task-field">
+          <div class="task-field-label">Author</div>
+          <div class="task-field-value" id="taskDetailAuthor"></div>
+        </div>
+
+        <div class="task-actions" id="taskEditActions" style="display: none;">
+          <button class="btn-save" id="saveTaskBtn">Save Changes</button>
+          <button class="btn-cancel" id="cancelTaskEditBtn">Cancel</button>
+        </div>
+      </div>
+
+      <div class="task-assignees">
+        <div class="assignees-title">Assigned To</div>
+        <div id="taskAssigneesList">
+          <p style="color: var(--text-light); font-size: 0.9rem;">No assignees</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
   <script src="toast.js"></script>
   <script src="fetch.js"></script>
   <script>
@@ -544,6 +811,229 @@
       } catch (e) {
         notify('Error loading tasks');
       }
+
+      // Task Details Sidebar
+      const taskDetailsSidebar = document.getElementById('taskDetailsSidebar');
+      const closeTaskDetails = document.getElementById('closeTaskDetails');
+      const editTaskIcon = document.getElementById('editTaskIcon');
+      const taskEditActions = document.getElementById('taskEditActions');
+      const saveTaskBtn = document.getElementById('saveTaskBtn');
+      const cancelTaskEditBtn = document.getElementById('cancelTaskEditBtn');
+
+      let currentTaskId = null;
+      let isEditingTask = false;
+
+      const openTaskDetails = async (taskId) => {
+        currentTaskId = taskId;
+        const task = projectTasks.find(t => String(t.id) === String(taskId));
+        if (!task) return;
+
+        // Populate task details
+        document.getElementById('taskDetailTitle').textContent = task.titre || 'No title';
+        document.getElementById('taskDetailTitleInput').value = task.titre || '';
+        
+        document.getElementById('taskDetailDescription').textContent = task.description || 'No description';
+        document.getElementById('taskDetailDescriptionInput').value = task.description || '';
+        
+        const deadlineDate = new Date(task.deadline);
+        const deadlineFormatted = `${String(deadlineDate.getDate()).padStart(2, '0')}/${String(deadlineDate.getMonth() + 1).padStart(2, '0')}/${deadlineDate.getFullYear()} ${String(deadlineDate.getHours()).padStart(2, '0')}:${String(deadlineDate.getMinutes()).padStart(2, '0')}`;
+        document.getElementById('taskDetailDeadline').textContent = deadlineFormatted;
+        
+        // Set datetime-local value (format: YYYY-MM-DDTHH:mm)
+        const deadlineISO = deadlineDate.toISOString().slice(0, 16);
+        document.getElementById('taskDetailDeadlineInput').value = deadlineISO;
+        
+        // State badge
+        const stateBadgeClass = {
+          'Todo': 'task-state-todo',
+          'en progres': 'task-state-progress',
+          'en verification': 'task-state-verify',
+          'terminee': 'task-state-done'
+        }[task.etat] || 'task-state-todo';
+        document.getElementById('taskDetailState').innerHTML = `<span class="task-state-badge ${stateBadgeClass}">${task.etat}</span>`;
+        
+        // Priority badge
+        const priorityLabels = { 1: 'Low', 2: 'Medium', 3: 'High' };
+        const priorityBadgeClass = `task-priority-${task.priorite}`;
+        document.getElementById('taskDetailPriority').innerHTML = `<span class="task-priority-badge ${priorityBadgeClass}">${priorityLabels[task.priorite] || task.priorite}</span>`;
+        document.getElementById('taskDetailPriorityInput').value = String(task.priorite);
+        
+        document.getElementById('taskDetailAuthor').textContent = task.auteur || 'Unknown';
+
+        // Render assignees
+        const assigneesList = document.getElementById('taskAssigneesList');
+        if (task.assignees && task.assignees.length > 0) {
+          assigneesList.innerHTML = '';
+          task.assignees.forEach(assignee => {
+            const assigneeItem = document.createElement('div');
+            assigneeItem.className = 'assignee-item';
+            const initials = `${(assignee.prenom || '?').charAt(0)}${(assignee.nom || '?').charAt(0)}`.toUpperCase();
+            assigneeItem.innerHTML = `
+              <div class="assignee-avatar">${initials}</div>
+              <div class="assignee-name">${assignee.prenom || ''} ${assignee.nom || ''}</div>
+            `;
+            assigneesList.appendChild(assigneeItem);
+          });
+        } else {
+          assigneesList.innerHTML = '<p style="color: var(--text-light); font-size: 0.9rem;">No assignees</p>';
+        }
+
+        taskDetailsSidebar.classList.add('open');
+      };
+
+      const closeTaskDetailsSidebar = () => {
+        taskDetailsSidebar.classList.remove('open');
+        if (isEditingTask) {
+          cancelTaskEdit();
+        }
+      };
+
+      const enableTaskEdit = () => {
+        isEditingTask = true;
+        
+        // Hide values, show inputs
+        document.getElementById('taskDetailTitle').style.display = 'none';
+        document.getElementById('taskDetailTitleInput').style.display = 'block';
+        
+        document.getElementById('taskDetailDescription').style.display = 'none';
+        document.getElementById('taskDetailDescriptionInput').style.display = 'block';
+        
+        document.getElementById('taskDetailDeadline').style.display = 'none';
+        document.getElementById('taskDetailDeadlineInput').style.display = 'block';
+        
+        document.getElementById('taskDetailPriority').style.display = 'none';
+        document.getElementById('taskDetailPriorityInput').style.display = 'block';
+        
+        taskEditActions.style.display = 'flex';
+        editTaskIcon.style.display = 'none';
+      };
+
+      const cancelTaskEdit = () => {
+        isEditingTask = false;
+        
+        // Show values, hide inputs
+        document.getElementById('taskDetailTitle').style.display = 'block';
+        document.getElementById('taskDetailTitleInput').style.display = 'none';
+        
+        document.getElementById('taskDetailDescription').style.display = 'block';
+        document.getElementById('taskDetailDescriptionInput').style.display = 'none';
+        
+        document.getElementById('taskDetailDeadline').style.display = 'block';
+        document.getElementById('taskDetailDeadlineInput').style.display = 'none';
+        
+        document.getElementById('taskDetailPriority').style.display = 'block';
+        document.getElementById('taskDetailPriorityInput').style.display = 'none';
+        
+        taskEditActions.style.display = 'none';
+        editTaskIcon.style.display = 'inline';
+      };
+
+      const saveTaskChanges = async () => {
+        const titre = document.getElementById('taskDetailTitleInput').value.trim();
+        const description = document.getElementById('taskDetailDescriptionInput').value.trim();
+        const deadline = document.getElementById('taskDetailDeadlineInput').value;
+        const priorite = parseInt(document.getElementById('taskDetailPriorityInput').value);
+
+        if (!titre || !deadline) {
+          notify('❌ Title and deadline are required');
+          return;
+        }
+
+        const deadlineISO = new Date(deadline).toISOString();
+
+        if (typeof window.showLoading === 'function') {
+          window.showLoading('Updating task...');
+        }
+
+        try {
+          const { ok, data, message } = await updateTask(currentTaskId, { titre, description, deadline: deadlineISO, priorite });
+          
+          if (typeof window.hideLoading === 'function') {
+            window.hideLoading();
+          }
+
+          if (ok) {
+            notify('✅ Task updated successfully');
+            
+            // Update local cache
+            const taskIndex = projectTasks.findIndex(t => String(t.id) === String(currentTaskId));
+            if (taskIndex !== -1 && data) {
+              projectTasks[taskIndex] = { ...projectTasks[taskIndex], ...data };
+            }
+            
+            // Re-render tasks
+            renderTasks();
+            
+            // Close edit mode and update displayed values
+            cancelTaskEdit();
+            openTaskDetails(currentTaskId);
+          } else {
+            notify('❌ ' + (message || 'Failed to update task'));
+          }
+        } catch (error) {
+          if (typeof window.hideLoading === 'function') {
+            window.hideLoading();
+          }
+          console.error('Error updating task:', error);
+          notify('❌ An error occurred while updating the task');
+        }
+      };
+
+      const deleteTaskHandler = async () => {
+        if (!confirm('Are you sure you want to delete this task?')) {
+          return;
+        }
+
+        if (typeof window.showLoading === 'function') {
+          window.showLoading('Deleting task...');
+        }
+
+        try {
+          const { ok, message } = await deleteTask(currentTaskId);
+          
+          if (typeof window.hideLoading === 'function') {
+            window.hideLoading();
+          }
+
+          if (ok) {
+            notify('✅ Task deleted successfully');
+            
+            // Remove from local cache
+            projectTasks = projectTasks.filter(t => String(t.id) !== String(currentTaskId));
+            
+            // Re-render tasks
+            renderTasks();
+            
+            // Close sidebar
+            closeTaskDetailsSidebar();
+          } else {
+            notify('❌ ' + (message || 'Failed to delete task'));
+          }
+        } catch (error) {
+          if (typeof window.hideLoading === 'function') {
+            window.hideLoading();
+          }
+          console.error('Error deleting task:', error);
+          notify('❌ An error occurred while deleting the task');
+        }
+      };
+
+      closeTaskDetails.addEventListener('click', closeTaskDetailsSidebar);
+      editTaskIcon.addEventListener('click', enableTaskEdit);
+      cancelTaskEditBtn.addEventListener('click', cancelTaskEdit);
+      saveTaskBtn.addEventListener('click', saveTaskChanges);
+      document.getElementById('deleteTaskBtn').addEventListener('click', deleteTaskHandler);
+
+      // Add click event to task cards
+      document.addEventListener('click', (e) => {
+        const taskCard = e.target.closest('.task-card');
+        if (taskCard && !taskCard.classList.contains('dragging')) {
+          const taskId = taskCard.dataset.taskId;
+          if (taskId) {
+            openTaskDetails(taskId);
+          }
+        }
+      });
 
       // Sidebar elements and logic
       const memberSidebar = document.getElementById('memberSidebar');

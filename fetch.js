@@ -271,6 +271,37 @@
 		}
 	}
 
+	// PATCH /taches/{id} — mettre à jour une tâche
+	async function updateTask(taskId, updateData) {
+		const url = `http://localhost:9090/taches/${encodeURIComponent(taskId)}`;
+		try {
+			const res = await fetch(url, {
+				method: 'PATCH',
+				headers: withAuth({ 'Content-Type': 'application/json' }),
+				body: JSON.stringify(updateData)
+			});
+
+			const text = await res.text();
+			if (res.ok) {
+				let data = null;
+				try { data = text ? JSON.parse(text) : null; } catch (_) { data = null; }
+				return { ok: true, data };
+			}
+
+			let message = 'Failed to update task';
+			try {
+				const err = text ? JSON.parse(text) : null;
+				if (err && err.message) message = err.message;
+				else if (text) message = text;
+			} catch (_) {
+				if (text) message = text;
+			}
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
 	// POST /taches/{projetId} — créer une tâche
 	async function createTask(projetId, titre, description, deadline, priorite) {
 		const url = `http://localhost:9090/taches/${encodeURIComponent(projetId)}`;
@@ -289,6 +320,35 @@
 			}
 
 			let message = 'Failed to create task';
+			try {
+				const err = text ? JSON.parse(text) : null;
+				if (err && err.message) message = err.message;
+				else if (text) message = text;
+			} catch (_) {
+				if (text) message = text;
+			}
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
+
+	// DELETE /taches/{id} — supprimer une tâche
+	async function deleteTask(taskId) {
+		const url = `http://localhost:9090/taches/${encodeURIComponent(taskId)}`;
+		try {
+			const res = await fetch(url, {
+				method: 'DELETE',
+				headers: withAuth({ 'Content-Type': 'application/json' })
+			});
+
+			const text = await res.text();
+			if (res.ok) {
+				return { ok: true, message: text || 'Task deleted successfully' };
+			}
+
+			let message = 'Failed to delete task';
 			try {
 				const err = text ? JSON.parse(text) : null;
 				if (err && err.message) message = err.message;
@@ -674,5 +734,7 @@
 	window.sendMessage = sendMessage;
 	window.updateProject = updateProject;
 	window.updateTaskState = updateTaskState;
+	window.updateTask = updateTask;
 	window.createTask = createTask;
+	window.deleteTask = deleteTask;
 })();
