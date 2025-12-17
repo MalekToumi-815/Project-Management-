@@ -294,8 +294,8 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.8);
-      width: 500px;
-      max-width: 90vw;
+      width: 850px;
+      max-width: 95vw;
       max-height: 85vh;
       background: #fff;
       box-shadow: 0 10px 50px rgba(0,0,0,0.2);
@@ -347,11 +347,14 @@
     .task-details-header .edit-icon:hover { opacity: 1; color: white; }
     .task-details-body {
       flex: 1;
-      overflow-y: auto;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+    }
+    .task-details-left {
       padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+      overflow-y: auto;
+      border-right: 1px solid var(--border-color);
     }
     .task-main-content { display: flex; flex-direction: column; gap: 16px; }
     .task-field {
@@ -489,6 +492,100 @@
       cursor: pointer;
     }
     .btn-cancel:hover { background: #dc2626; }
+    
+    /* Assignment Panel */
+    .task-details-right {
+      background: #fafbfc;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .assignment-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+      background: white;
+    }
+    .assignment-header h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 0;
+    }
+    .assignment-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+    .assignment-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+    }
+    .assignment-item:hover {
+      border-color: var(--primary-color);
+      box-shadow: 0 2px 8px rgba(67, 97, 238, 0.1);
+    }
+    .assignment-checkbox {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--primary-color);
+      flex-shrink: 0;
+    }
+    .assignment-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+    .assignment-name {
+      flex: 1;
+      font-size: 0.85rem;
+      color: var(--text-dark);
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .assignment-footer {
+      padding: 12px;
+      border-top: 1px solid var(--border-color);
+      background: white;
+    }
+    .btn-assign {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-assign:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(67, 97, 238, 0.3);
+    }
+    .btn-assign:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
   </style>
 </head>
 <body>
@@ -633,7 +730,7 @@
   </div>
 
   <!-- Task Details Sidebar -->
-  <aside class="task-details-sidebar" id="taskDetailsSidebar">
+  <aside class="task-details-sidebar" id="taskDetailsSidebar" style="position: fixed;">
     <div class="task-details-header">
       <h3 class="task-details-title">Task Details</h3>
       <div class="task-details-header-actions">
@@ -643,7 +740,7 @@
       </div>
     </div>
     <div class="task-details-body">
-      <div class="task-main-content">
+      <div class="task-details-left">
         <div class="task-field">
           <div class="task-field-label">Title</div>
           <div class="task-field-value" id="taskDetailTitle"></div>
@@ -682,16 +779,29 @@
           <div class="task-field-value" id="taskDetailAuthor"></div>
         </div>
 
+        <div class="task-field">
+          <div class="task-field-label">Assigned Members</div>
+          <div class="task-field-value" id="taskDetailAssignees" style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <!-- Assigned members will be displayed here -->
+          </div>
+        </div>
+
         <div class="task-actions" id="taskEditActions" style="display: none;">
           <button class="btn-save" id="saveTaskBtn">Save Changes</button>
           <button class="btn-cancel" id="cancelTaskEditBtn">Cancel</button>
         </div>
       </div>
 
-      <div class="task-assignees">
-        <div class="assignees-title">Assigned To</div>
-        <div id="taskAssigneesList">
-          <p style="color: var(--text-light); font-size: 0.9rem;">No assignees</p>
+      <!-- Right Panel: Assignment Section -->
+      <div class="task-details-right">
+        <div class="assignment-header">
+          <h4>ASSIGN MEMBERS</h4>
+        </div>
+        <div class="assignment-list" id="assignmentList">
+          <!-- Member checkboxes will be injected here -->
+        </div>
+        <div class="assignment-footer">
+          <button class="btn-assign" id="confirmAssignBtn">Update Assignments</button>
         </div>
       </div>
     </div>
@@ -828,6 +938,14 @@
         const task = projectTasks.find(t => String(t.id) === String(taskId));
         if (!task) return;
 
+        // Load members if not already loaded
+        if (projectMembers.length === 0) {
+          const { ok, data } = await getProjectMembers(projectId);
+          if (ok && data) {
+            projectMembers = data;
+          }
+        }
+
         // Populate task details
         document.getElementById('taskDetailTitle').textContent = task.titre || 'No title';
         document.getElementById('taskDetailTitleInput').value = task.titre || '';
@@ -860,22 +978,50 @@
         
         document.getElementById('taskDetailAuthor').textContent = task.auteur || 'Unknown';
 
-        // Render assignees
-        const assigneesList = document.getElementById('taskAssigneesList');
+        // Display assigned members
+        const taskDetailAssignees = document.getElementById('taskDetailAssignees');
+        taskDetailAssignees.innerHTML = '';
         if (task.assignees && task.assignees.length > 0) {
-          assigneesList.innerHTML = '';
           task.assignees.forEach(assignee => {
-            const assigneeItem = document.createElement('div');
-            assigneeItem.className = 'assignee-item';
             const initials = `${(assignee.prenom || '?').charAt(0)}${(assignee.nom || '?').charAt(0)}`.toUpperCase();
+            const assigneeItem = document.createElement('div');
+            assigneeItem.style.cssText = 'display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: #f0f4ff; border-radius: 20px; font-size: 0.85rem;';
             assigneeItem.innerHTML = `
-              <div class="assignee-avatar">${initials}</div>
-              <div class="assignee-name">${assignee.prenom || ''} ${assignee.nom || ''}</div>
+              <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.7rem;">${initials}</div>
+              <span style="color: var(--text-dark); font-weight: 500;">${assignee.prenom || ''} ${assignee.nom || ''}</span>
             `;
-            assigneesList.appendChild(assigneeItem);
+            taskDetailAssignees.appendChild(assigneeItem);
           });
         } else {
-          assigneesList.innerHTML = '<p style="color: var(--text-light); font-size: 0.9rem;">No assignees</p>';
+          taskDetailAssignees.innerHTML = '<span style="color: var(--text-light); font-size: 0.85rem;">No members assigned</span>';
+        }
+
+        // Populate assignment list with only unassigned members
+        const assignedUserIds = new Set(
+          (task.assignees || []).map(assignee => parseInt(assignee.id))
+        );
+
+        assignmentList.innerHTML = '';
+        const unassignedMembers = projectMembers.filter(member => 
+          !assignedUserIds.has(parseInt(member.id))
+        );
+        
+        if (unassignedMembers.length === 0) {
+          assignmentList.innerHTML = '<p style="padding: 20px; text-align: center; color: var(--text-light); font-size: 0.85rem;">All members are already assigned</p>';
+          confirmAssignBtn.disabled = true;
+        } else {
+          confirmAssignBtn.disabled = false;
+          unassignedMembers.forEach(member => {
+            const item = document.createElement('div');
+            item.className = 'assignment-item';
+            const initials = `${(member.prenom || '?').charAt(0)}${(member.nom || '?').charAt(0)}`.toUpperCase();
+            item.innerHTML = `
+              <input type="checkbox" class="assignment-checkbox" data-user-id="${member.id}" />
+              <div class="assignment-avatar">${initials}</div>
+              <div class="assignment-name">${member.prenom || ''} ${member.nom || ''}</div>
+            `;
+            assignmentList.appendChild(item);
+          });
         }
 
         taskDetailsSidebar.classList.add('open');
@@ -1017,6 +1163,64 @@
           notify('❌ An error occurred while deleting the task');
         }
       };
+
+      // Assignment Panel
+      const assignmentList = document.getElementById('assignmentList');
+      const confirmAssignBtn = document.getElementById('confirmAssignBtn');
+
+      const assignSelectedMembers = async () => {
+        const checkboxes = assignmentList.querySelectorAll('.assignment-checkbox');
+        const selectedUserIds = [];
+        
+        checkboxes.forEach(cb => {
+          if (cb.checked) {
+            selectedUserIds.push(parseInt(cb.dataset.userId));
+          }
+        });
+
+        if (selectedUserIds.length === 0) {
+          notify('❌ Please select at least one member');
+          return;
+        }
+
+        if (typeof window.showLoading === 'function') {
+          window.showLoading('Updating assignments...');
+        }
+
+        try {
+          const { ok, message } = await assignTaskMembers(currentTaskId, selectedUserIds);
+          
+          if (typeof window.hideLoading === 'function') {
+            window.hideLoading();
+          }
+
+          if (ok) {
+            notify('✅ Members assigned successfully');
+            
+            // Update local cache with selected members
+            const taskIndex = projectTasks.findIndex(t => String(t.id) === String(currentTaskId));
+            if (taskIndex !== -1) {
+              const selectedMembers = projectMembers.filter(m => 
+                selectedUserIds.includes(parseInt(m.id))
+              );
+              projectTasks[taskIndex].assignees = selectedMembers;
+            }
+            
+            // Refresh display
+            openTaskDetails(currentTaskId);
+          } else {
+            notify('❌ ' + (message || 'Failed to assign members'));
+          }
+        } catch (error) {
+          if (typeof window.hideLoading === 'function') {
+            window.hideLoading();
+          }
+          console.error('Error assigning members:', error);
+          notify('❌ An error occurred while assigning members');
+        }
+      };
+
+      confirmAssignBtn.addEventListener('click', assignSelectedMembers);
 
       closeTaskDetails.addEventListener('click', closeTaskDetailsSidebar);
       editTaskIcon.addEventListener('click', enableTaskEdit);

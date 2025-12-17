@@ -334,6 +334,36 @@
 	}
 
 
+	// GET /taches/{id} — obtenir les détails d'une tâche
+	async function getTask(taskId) {
+		const url = `http://localhost:9090/taches/${encodeURIComponent(taskId)}`;
+		try {
+			const res = await fetch(url, {
+				method: 'GET',
+				headers: withAuth({ 'Accept': 'application/json' })
+			});
+
+			const text = await res.text();
+			if (res.ok) {
+				let data = null;
+				try { data = text ? JSON.parse(text) : null; } catch (_) { data = null; }
+				return { ok: true, data };
+			}
+
+			let message = 'Failed to get task';
+			try {
+				const err = text ? JSON.parse(text) : null;
+				if (err && err.message) message = err.message;
+				else if (text) message = text;
+			} catch (_) {
+				if (text) message = text;
+			}
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
 	// DELETE /taches/{id} — supprimer une tâche
 	async function deleteTask(taskId) {
 		const url = `http://localhost:9090/taches/${encodeURIComponent(taskId)}`;
@@ -714,6 +744,29 @@
 		}
 	}
 
+	// POST /taches/{id}/assigner — assign multiple members to a task
+	async function assignTaskMembers(taskId, userIds) {
+		const url = `http://localhost:9090/taches/${encodeURIComponent(taskId)}/assigner`;
+		try {
+			const res = await fetch(url, {
+				method: 'POST',
+				headers: withAuth({ 'Content-Type': 'application/json' }),
+				body: JSON.stringify({ userIds })
+			});
+
+			const text = await res.text();
+			if (res.ok) {
+				return { ok: true, message: text || 'Members assigned successfully' };
+			}
+
+			let message = 'Failed to assign members';
+			try { const data = JSON.parse(text); message = data.message || message; } catch (_) { message = text || message; }
+			return { ok: false, message };
+		} catch (err) {
+			return { ok: false, message: 'Network error. Please try again.' };
+		}
+	}
+
 	window.loginUser = loginUser;
 	window.getUserProfileproject = getUserProfileproject;
 	window.getUserProfilehome = getUserProfilehome;
@@ -736,5 +789,7 @@
 	window.updateTaskState = updateTaskState;
 	window.updateTask = updateTask;
 	window.createTask = createTask;
+	window.getTask = getTask;
 	window.deleteTask = deleteTask;
+	window.assignTaskMembers = assignTaskMembers;
 })();
