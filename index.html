@@ -310,6 +310,10 @@ header {
     border-bottom: 1px solid #e9ecef;
 }
 
+.features .container {
+    max-width: 1600px;
+}
+
 .section-title {
     text-align: center;
     font-size: 2.4rem;
@@ -320,12 +324,13 @@ header {
 .cards {
     display: flex;
     justify-content: center;
-    gap: 35px;
-    flex-wrap: wrap;
+    gap: 30px;
+    flex-wrap: nowrap;
 }
 
 .card {
-    width: 320px;
+    flex: 1;
+    max-width: 480px;
     background: white;
     border-radius: 16px;
     box-shadow: var(--shadow);
@@ -339,19 +344,20 @@ header {
 
 .card img {
     width: 100%;
-    height: 220px;
-    object-fit: cover;
+    height: 320px;
+    object-fit: contain;
+    background: #f8f9fa;
 }
 
 .card h3 {
-    padding: 18px 18px 8px;
-    font-size: 1.25rem;
+    padding: 20px 20px 10px;
+    font-size: 1.4rem;
 }
 
 .card p {
-    padding: 0 18px 20px;
+    padding: 0 20px 24px;
     color: var(--text-light);
-    font-size: 0.95rem;
+    font-size: 1rem;
 }
 
 /* ================= FOOTER ================= */
@@ -459,19 +465,19 @@ footer {
 
         <div class="cards">
             <div class="card">
-                <img src="home.html.png">
+                <img src="images/HomeScreenshot.png">
                 <h3>Home Dashboard</h3>
                 <p>All your projects in one clear and intuitive dashboard.</p>
             </div>
 
             <div class="card">
-                <img src="project-details.html.png">
+                <img src="images/ProjectScreenshot.png">
                 <h3>Project Management</h3>
                 <p>Track progress, manage teams and deadlines easily.</p>
             </div>
 
             <div class="card">
-                <img src="chat.html.png">
+                <img src="images/ChatScreenshot.png">
                 <h3>Team Chat</h3>
                 <p>Collaborate instantly with built-in real-time chat.</p>
             </div>
