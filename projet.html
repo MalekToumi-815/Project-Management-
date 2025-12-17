@@ -880,7 +880,10 @@
           col.innerHTML = '';
         });
 
-        projectTasks.forEach(task => {
+        // Sort tasks by priority descending (3=High, 2=Medium, 1=Low)
+        const sortedTasks = [...projectTasks].sort((a, b) => b.priorite - a.priorite);
+
+        sortedTasks.forEach(task => {
           const column = taskColumns[task.etat];
           if (!column) return;
 

@@ -1298,7 +1298,11 @@
 
         if (ok && tasks && tasks.length > 0) {
           assignedTasksList.innerHTML = '';
-          tasks.forEach(task => {
+          
+          // Sort tasks by priority descending (3=High, 2=Medium, 1=Low)
+          const sortedTasks = [...tasks].sort((a, b) => b.priorite - a.priorite);
+          
+          sortedTasks.forEach(task => {
             const taskItem = document.createElement('div');
             taskItem.className = 'project-item';
             
