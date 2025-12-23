@@ -313,9 +313,7 @@
           localStorage.setItem('authToken', token);
           notify('Loged in!');
           // Redirect to home page
-          setTimeout(() => {
-            window.location.href = 'home.html';
-          }, 1500);
+          window.location.href = 'home.html';
         } else {
           notify(message || 'Login failed');
         }
