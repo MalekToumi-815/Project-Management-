@@ -3,6 +3,8 @@
 (function(){
 	if (typeof window === 'undefined') return;
 
+	const BASE_URL = 'https://projectmanagement-production-d023.up.railway.app';
+
 	function getAuthToken() {
 		try {
 			return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
@@ -18,7 +20,7 @@
 	}
 
 	async function createUser(nom, prenom, email, motDePasse) {
-		const url = 'http://localhost:9090/users/signin';
+		const url = `${BASE_URL}/users/signin`;
 		try {
 			const res = await fetch(url, {
 				method: 'POST',
@@ -37,7 +39,7 @@
 	}
 
 	async function loginUser(email, motDePasse) {
-		const url = 'http://localhost:9090/auth/login';
+		const url = `${BASE_URL}/auth/login`;
 		try {
 			const res = await fetch(url, {
 				method: 'POST',
@@ -62,7 +64,7 @@
 
 	// GET /projets/{id} — fetch project details
 	async function getProject(id) {
-		const url = `http://localhost:9090/projets/${encodeURIComponent(id)}`;
+		const url = `${BASE_URL}/projets/${encodeURIComponent(id)}`;
 		try {
 			const res = await fetch(url, {
 				method: 'GET',
@@ -86,7 +88,7 @@
 
 	// GET /projets/{projetId}/taches — list tasks for a project
 	async function getProjectTasks(projetId) {
-		const url = `http://localhost:9090/projets/${encodeURIComponent(projetId)}/taches`;
+		const url = `${BASE_URL}/projets/${encodeURIComponent(projetId)}/taches`;
 		try {
 			const res = await fetch(url, {
 				method: 'GET',
@@ -108,7 +110,7 @@
 
 	// GET /projets/{id}/membres — list project members
 	async function getProjectMembers(id) {
-		const url = `http://localhost:9090/projets/${encodeURIComponent(id)}/membres`;
+		const url = `${BASE_URL}/projets/${encodeURIComponent(id)}/membres`;
 		try {
 			const res = await fetch(url, {
 				method: 'GET',
@@ -130,7 +132,7 @@
 
 	// GET /messages/{chatId} — list chat messages
 	async function getChatMessages(chatId) {
-		const url = `http://localhost:9090/messages/${encodeURIComponent(chatId)}`;
+		const url = `${BASE_URL}/messages/${encodeURIComponent(chatId)}`;
 		try {
 			const res = await fetch(url, {
 				method: 'GET',
@@ -152,7 +154,7 @@
 
 	// DELETE /projets/{id}/membres/{userId} — retirer un membre (créateur)
 	async function kickMember(projectId, userId) {
-		const url = `http://localhost:9090/projets/${encodeURIComponent(projectId)}/membres/${encodeURIComponent(userId)}`;
+		const url = `${BASE_URL}/projets/${encodeURIComponent(projectId)}/membres/${encodeURIComponent(userId)}`;
 		try {
 			const res = await fetch(url, {
 				method: 'DELETE',
@@ -180,7 +182,7 @@
 
 	// POST /messages/{chatId} — envoyer un message
 	async function sendMessage(chatId, contenu) {
-		const url = `http://localhost:9090/messages/${encodeURIComponent(chatId)}`;
+		const url = `${BASE_URL}/messages/${encodeURIComponent(chatId)}`;
 		try {
 			const res = await fetch(url, {
 				method: 'POST',
@@ -211,7 +213,7 @@
 
 	// PATCH /projets/{id} — mettre à jour (créateur uniquement)
 	async function updateProject(id, updateData) {
-		const url = `http://localhost:9090/projets/${encodeURIComponent(id)}`;
+		const url = `${BASE_URL}/projets/${encodeURIComponent(id)}`;
 		try {
 			const res = await fetch(url, {
 				method: 'PATCH',
@@ -242,7 +244,7 @@
 
 	// PATCH /taches/{id}/etat — changer l’état (créateur seul pour "terminee")
 	async function updateTaskState(taskId, newState) {
-		const url = `http://localhost:9090/taches/${encodeURIComponent(taskId)}/etat`;
+		const url = `${BASE_URL}/taches/${encodeURIComponent(taskId)}/etat`;
 		try {
 			const res = await fetch(url, {
 				method: 'PATCH',
@@ -273,7 +275,7 @@
 
 	// PATCH /taches/{id} — mettre à jour une tâche
 	async function updateTask(taskId, updateData) {
-		const url = `http://localhost:9090/taches/${encodeURIComponent(taskId)}`;
+		const url = `${BASE_URL}/taches/${encodeURIComponent(taskId)}`;
 		try {
 			const res = await fetch(url, {
 				method: 'PATCH',
@@ -304,7 +306,7 @@
 
 	// POST /taches/{projetId} — créer une tâche
 	async function createTask(projetId, titre, description, deadline, priorite) {
-		const url = `http://localhost:9090/taches/${encodeURIComponent(projetId)}`;
+		const url = `${BASE_URL}/taches/${encodeURIComponent(projetId)}`;
 		try {
 			const res = await fetch(url, {
 				method: 'POST',
@@ -336,7 +338,7 @@
 
 	// GET /taches/{id} — obtenir les détails d'une tâche
 	async function getTask(taskId) {
-		const url = `http://localhost:9090/taches/${encodeURIComponent(taskId)}`;
+		const url = `${BASE_URL}/taches/${encodeURIComponent(taskId)}`;
 		try {
 			const res = await fetch(url, {
 				method: 'GET',
@@ -366,7 +368,7 @@
 
 	// DELETE /taches/{id} — supprimer une tâche
 	async function deleteTask(taskId) {
-		const url = `http://localhost:9090/taches/${encodeURIComponent(taskId)}`;
+		const url = `${BASE_URL}/taches/${encodeURIComponent(taskId)}`;
 		try {
 			const res = await fetch(url, {
 				method: 'DELETE',
@@ -394,7 +396,7 @@
 
 	// GET /users/profile — profil utilisateur (auth)
 	async function getUserProfileproject() {
-		const url = `http://localhost:9090/users/profile`;
+		const url = `${BASE_URL}/users/profile`;
 		try {
 			const res = await fetch(url, {
 				method: 'GET',
@@ -417,7 +419,7 @@
 	}
 
 	async function getUserProfilehome() {
-		const url = 'http://localhost:9090/users/profile';
+		const url = `${BASE_URL}/users/profile`;
 		const token = localStorage.getItem('authToken');
 		
 		if (!token) {
@@ -454,7 +456,7 @@
 	}
 
 	async function updateProfile(nom, prenom) {
-		const url = 'http://localhost:9090/users/profile';
+		const url = `${BASE_URL}/users/profile`;
 		const token = localStorage.getItem('authToken');
 		
 		if (!token) {
@@ -487,7 +489,7 @@
 	}
 
 	async function updatePassword(oldPassword, newPassword) {
-		const url = 'http://localhost:9090/users/password';
+		const url = `${BASE_URL}/users/password`;
 		const token = localStorage.getItem('authToken');
 		
 		if (!token) {
@@ -526,7 +528,7 @@
 	}
 
 	async function getUserCreatedProjects() {
-		const url = 'http://localhost:9090/users/projets-created';
+		const url = `${BASE_URL}/users/projets-created`;
 		const token = localStorage.getItem('authToken');
 		
 		if (!token) {
@@ -557,7 +559,7 @@
 	}
 
 	async function getUserJoinedProjects() {
-		const url = 'http://localhost:9090/users/projets-joined';
+		const url = `${BASE_URL}/users/projets-joined`;
 		const token = localStorage.getItem('authToken');
 		
 		if (!token) {
@@ -588,7 +590,7 @@
 	}
 
 	async function getUserAssignedTasks() {
-		const url = 'http://localhost:9090/users/taches-assignees';
+		const url = `${BASE_URL}/users/taches-assignees`;
 		const token = localStorage.getItem('authToken');
 		
 		if (!token) {
@@ -619,7 +621,7 @@
 	}
 
 	async function joinProject(projectId) {
-		const url = `http://localhost:9090/projets/${projectId}/join`;
+		const url = `${BASE_URL}/projets/${projectId}/join`;
 		const token = localStorage.getItem('authToken');
 		
 		if (!token) {
@@ -650,7 +652,7 @@
 	}
 
 	async function createProject(nom, description) {
-		const url = 'http://localhost:9090/projets';
+		const url = `${BASE_URL}/projets`;
 		const token = localStorage.getItem('authToken');
 		
 		if (!token) {
@@ -683,7 +685,7 @@
 	}
 
 	async function deleteProject(projectId) {
-		const url = `http://localhost:9090/projets/${projectId}`;
+		const url = `${BASE_URL}/projets/${projectId}`;
 		const token = localStorage.getItem('authToken');
 		
 		if (!token) {
@@ -714,7 +716,7 @@
 	}
 
 	async function leaveProject(projectId) {
-		const url = `http://localhost:9090/projets/${projectId}/leave`;
+		const url = `${BASE_URL}/projets/${projectId}/leave`;
 		const token = localStorage.getItem('authToken');
 		
 		if (!token) {
@@ -746,7 +748,7 @@
 
 	// POST /taches/{id}/assigner — assign multiple members to a task
 	async function assignTaskMembers(taskId, userIds) {
-		const url = `http://localhost:9090/taches/${encodeURIComponent(taskId)}/assigner`;
+		const url = `${BASE_URL}/taches/${encodeURIComponent(taskId)}/assigner`;
 		try {
 			const res = await fetch(url, {
 				method: 'POST',
