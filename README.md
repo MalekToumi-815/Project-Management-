@@ -2,6 +2,8 @@
 
 A modern, intuitive web application for managing projects, tasks, and team collaboration. This frontend is built to interface with our custom Project Management API [API Repository](https://github.com/malek-chermiti/project_management)
 
+**🌐 Live Demo**: [https://workify.up.railway.app](https://workify.up.railway.app)
+
 ![Workify Logo](images/logo.png)
 
 ## 📋 Description
@@ -48,7 +50,11 @@ Workify is a comprehensive project management solution that allows teams to crea
 - A modern web browser (Chrome, Firefox, Safari, Edge)
 - Backend API running (see [API Repository](https://github.com/malek-chermiti/project_management))
 
-### Installation
+### Live Application
+
+The application is deployed and ready to use at: **[https://workify.up.railway.app](https://workify.up.railway.app)**
+
+### Local Installation
 
 1. Clone this repository:
 ```bash
@@ -56,7 +62,12 @@ git clone <repository-url>
 cd Project-Management-
 ```
 
-2. Ensure the backend API is running on `http://localhost:9090`
+2. Update the `BASE_URL` in `fetch.js` to point to your backend:
+```javascript
+const BASE_URL = 'https://projectmanagement-production-d023.up.railway.app';
+// or for local development:
+// const BASE_URL = 'http://localhost:9090';
+```
 
 3. Open `index.html` in your web browser or serve it using a local server:
 ```bash
@@ -74,9 +85,11 @@ php -S localhost:8000
 
 ## 📡 API Integration
 
-This frontend connects to our Project Management API. The API must be running and accessible at `http://localhost:9090`.
+This frontend connects to our Project Management API deployed at `https://projectmanagement-production-d023.up.railway.app`.
 
 **API Repository**: [https://github.com/malek-chermiti/project_management](https://github.com/malek-chermiti/project_management)
+
+The base API URL can be easily configured in `fetch.js` by updating the `BASE_URL` constant at the top of the file.
 
 All API calls are handled through `fetch.js`, which provides wrapper functions for:
 - User authentication and profile management
