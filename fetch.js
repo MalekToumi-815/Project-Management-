@@ -3,7 +3,7 @@
 (function(){
 	if (typeof window === 'undefined') return;
 
-	const BASE_URL = 'https://projectmanagement-production-d023.up.railway.app';
+	const BASE_URL = 'https://projectmanagement-production-b216.up.railway.app';
 
 	function getAuthToken() {
 		try {
